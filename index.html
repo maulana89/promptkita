@@ -4,592 +4,188 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PROMPT KITA — Prompt AI Terbaik untuk Kreator Indonesia</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap');
-
-:root {
-  --bg:      #080c14;
-  --bg2:     #0d1220;
-  --bg3:     #111827;
-  --card:    #0f1623;
-  --border:  #1e2d45;
-  --border2: #253650;
-  --blue:    #3b82f6;
-  --blue2:   #2563eb;
-  --blue3:   #1d4ed8;
-  --blue-dim:#1e3a5f;
-  --blue-bg: rgba(59,130,246,0.08);
-  --blue-glow: rgba(59,130,246,0.15);
-  --text:    #f1f5f9;
-  --text2:   #94a3b8;
-  --text3:   #475569;
-  --accent:  #38bdf8;
-  --head:    'Syne', sans-serif;
-  --body:    'Plus Jakarta Sans', sans-serif;
-  --r:       10px;
-  --r2:      16px;
+:root{
+  --bg:#080c14;--bg2:#0d1220;--bg3:#111827;--card:#0f1623;
+  --border:#1e2d45;--border2:#253650;
+  --blue:#3b82f6;--blue2:#2563eb;--blue3:#1d4ed8;
+  --blue-dim:#1e3a5f;--blue-bg:rgba(59,130,246,0.08);
+  --text:#f1f5f9;--text2:#94a3b8;--text3:#475569;
+  --accent:#38bdf8;
+  --head:'Syne',sans-serif;--body:'Plus Jakarta Sans',sans-serif;
+  --r:10px;--r2:16px;
 }
-
 *{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
 body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:15px;line-height:1.6;overflow-x:hidden;}
-
-/* scrollbar */
 ::-webkit-scrollbar{width:5px;}
 ::-webkit-scrollbar-track{background:var(--bg);}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+.hidden{display:none!important;}
 
-/* ─── NOISE TEXTURE OVERLAY ─── */
-body::before{
-  content:'';position:fixed;inset:0;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-  pointer-events:none;z-index:0;opacity:0.4;
-}
-
-/* ─── NAVBAR ─── */
-nav{
-  position:sticky;top:0;z-index:100;
-  background:rgba(8,12,20,0.92);
-  backdrop-filter:blur(16px);
-  border-bottom:1px solid var(--border);
-  height:64px;padding:0 32px;
-  display:flex;align-items:center;justify-content:space-between;
-}
-.logo{
-  display:flex;align-items:center;gap:10px;cursor:pointer;
-  font-family:var(--head);font-size:20px;font-weight:800;
-  letter-spacing:-0.02em;
-}
-.logo-icon{
-  width:34px;height:34px;
-  background:linear-gradient(135deg,var(--blue),var(--accent));
-  border-radius:8px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:16px;color:#fff;font-weight:800;
-  font-family:var(--head);
-  box-shadow:0 0 20px rgba(59,130,246,0.3);
-}
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(8,12,20,0.93);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);height:64px;padding:0 32px;display:flex;align-items:center;justify-content:space-between;}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer;font-family:var(--head);font-size:20px;font-weight:800;letter-spacing:-0.02em;}
+.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--blue),var(--accent));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;font-weight:800;font-family:var(--head);box-shadow:0 0 20px rgba(59,130,246,0.3);}
 .logo span{color:var(--blue);}
 .nav-links{display:flex;align-items:center;gap:6px;}
-.nav-link{
-  background:transparent;border:none;
-  color:var(--text2);padding:8px 14px;
-  border-radius:var(--r);cursor:pointer;
-  font-family:var(--body);font-size:14px;
-  transition:all .2s;
-}
+.nav-link{background:transparent;border:none;color:var(--text2);padding:8px 14px;border-radius:var(--r);cursor:pointer;font-family:var(--body);font-size:14px;transition:all .2s;}
 .nav-link:hover{color:var(--text);background:var(--bg2);}
-.btn-nav-ghost{
-  background:transparent;
-  border:1px solid var(--border2);
-  color:var(--text2);padding:8px 18px;
-  border-radius:var(--r);cursor:pointer;
-  font-family:var(--body);font-size:14px;font-weight:500;
-  transition:all .2s;
-}
-.btn-nav-ghost:hover{border-color:var(--blue);color:var(--blue);}
-.btn-nav-blue{
-  background:var(--blue);border:none;
-  color:#fff;padding:8px 18px;
-  border-radius:var(--r);cursor:pointer;
-  font-family:var(--body);font-size:14px;font-weight:600;
-  transition:all .2s;
-  box-shadow:0 0 20px rgba(59,130,246,0.25);
-}
-.btn-nav-blue:hover{background:var(--blue2);box-shadow:0 0 28px rgba(59,130,246,0.4);}
-
-/* user nav */
-.token-chip{
-  display:flex;align-items:center;gap:6px;
-  background:var(--blue-bg);
-  border:1px solid rgba(59,130,246,0.2);
-  color:var(--blue);padding:7px 14px;
-  border-radius:var(--r);cursor:pointer;
-  font-size:13px;font-weight:600;transition:all .2s;
-}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text2);padding:8px 18px;border-radius:var(--r);cursor:pointer;font-size:14px;font-weight:500;transition:all .2s;}
+.btn-ghost:hover{border-color:var(--blue);color:var(--blue);}
+.btn-blue{background:var(--blue);border:none;color:#fff;padding:8px 18px;border-radius:var(--r);cursor:pointer;font-size:14px;font-weight:600;transition:all .2s;box-shadow:0 0 20px rgba(59,130,246,0.25);}
+.btn-blue:hover{background:var(--blue2);}
+.token-chip{display:flex;align-items:center;gap:6px;background:var(--blue-bg);border:1px solid rgba(59,130,246,0.2);color:var(--blue);padding:7px 14px;border-radius:var(--r);cursor:pointer;font-size:13px;font-weight:600;transition:all .2s;}
 .token-chip:hover{background:rgba(59,130,246,0.14);}
-.avatar{
-  width:34px;height:34px;border-radius:50%;
-  background:linear-gradient(135deg,var(--blue),var(--accent));
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--head);font-size:13px;font-weight:700;color:#fff;
-  cursor:pointer;border:2px solid rgba(59,130,246,0.3);
-}
+.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--accent));display:flex;align-items:center;justify-content:center;font-family:var(--head);font-size:13px;font-weight:700;color:#fff;cursor:pointer;border:2px solid rgba(59,130,246,0.3);position:relative;}
+.avatar-menu{position:absolute;top:44px;right:0;background:var(--card);border:1px solid var(--border);border-radius:var(--r2);min-width:180px;overflow:hidden;display:none;box-shadow:0 8px 32px rgba(0,0,0,0.4);}
+.avatar-menu.open{display:block;}
+.avatar-menu-item{display:block;width:100%;text-align:left;padding:11px 16px;background:none;border:none;color:var(--text2);font-size:13px;cursor:pointer;transition:all .2s;border-bottom:1px solid var(--border);}
+.avatar-menu-item:last-child{border-bottom:none;}
+.avatar-menu-item:hover{background:var(--bg2);color:var(--text);}
+.avatar-menu-item.red:hover{color:#f87171;}
 
-/* ─── PAGES ─── */
+/* PAGES */
 .page{display:none;}
 .page.active{display:block;}
 
-/* ─── HERO ─── */
-.hero{
-  min-height:calc(100vh - 64px);
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  text-align:center;padding:80px 24px 60px;
-  position:relative;overflow:hidden;
-}
-.hero-glow{
-  position:absolute;top:-200px;left:50%;transform:translateX(-50%);
-  width:800px;height:600px;
-  background:radial-gradient(ellipse, rgba(59,130,246,0.12) 0%, transparent 70%);
-  pointer-events:none;
-}
-.hero-glow2{
-  position:absolute;bottom:-100px;right:-200px;
-  width:500px;height:400px;
-  background:radial-gradient(ellipse, rgba(56,189,248,0.06) 0%, transparent 70%);
-  pointer-events:none;
-}
-.badge{
-  display:inline-flex;align-items:center;gap:8px;
-  background:rgba(59,130,246,0.1);
-  border:1px solid rgba(59,130,246,0.25);
-  color:var(--accent);padding:6px 16px;
-  border-radius:999px;font-size:12px;font-weight:600;
-  letter-spacing:0.04em;margin-bottom:28px;
-  position:relative;
-}
-.badge-dot{
-  width:6px;height:6px;background:var(--accent);
-  border-radius:50%;animation:blink 2s infinite;
-}
+/* HERO */
+.hero{min-height:calc(100vh - 64px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 24px 60px;position:relative;overflow:hidden;}
+.hero-glow{position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:800px;height:600px;background:radial-gradient(ellipse,rgba(59,130,246,0.12) 0%,transparent 70%);pointer-events:none;}
+.badge{display:inline-flex;align-items:center;gap:8px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);color:var(--accent);padding:6px 16px;border-radius:999px;font-size:12px;font-weight:600;letter-spacing:0.04em;margin-bottom:28px;}
+.badge-dot{width:6px;height:6px;background:var(--accent);border-radius:50%;animation:blink 2s infinite;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-
-.hero h1{
-  font-family:var(--head);
-  font-size:clamp(36px,6vw,72px);
-  font-weight:800;line-height:1.05;
-  letter-spacing:-0.03em;
-  max-width:860px;margin-bottom:22px;
-}
-.hero h1 .grad{
-  background:linear-gradient(135deg,var(--blue) 0%,var(--accent) 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  background-clip:text;
-}
-.hero p{
-  color:var(--text2);font-size:18px;
-  max-width:560px;margin-bottom:44px;line-height:1.7;
-}
+.hero h1{font-family:var(--head);font-size:clamp(36px,6vw,72px);font-weight:800;line-height:1.05;letter-spacing:-0.03em;max-width:860px;margin-bottom:22px;}
+.hero h1 .grad{background:linear-gradient(135deg,var(--blue) 0%,var(--accent) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero p{color:var(--text2);font-size:18px;max-width:560px;margin-bottom:44px;line-height:1.7;}
 .hero-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:72px;}
-.btn-primary{
-  background:var(--blue);border:none;color:#fff;
-  padding:15px 32px;border-radius:var(--r);
-  font-family:var(--body);font-size:15px;font-weight:600;
-  cursor:pointer;transition:all .25s;
-  box-shadow:0 0 30px rgba(59,130,246,0.35);
-}
-.btn-primary:hover{background:var(--blue2);transform:translateY(-2px);box-shadow:0 0 40px rgba(59,130,246,0.5);}
-.btn-outline{
-  background:transparent;
-  border:1px solid var(--border2);color:var(--text);
-  padding:15px 32px;border-radius:var(--r);
-  font-family:var(--body);font-size:15px;font-weight:500;
-  cursor:pointer;transition:all .25s;
-}
+.btn-primary{background:var(--blue);border:none;color:#fff;padding:15px 32px;border-radius:var(--r);font-size:15px;font-weight:600;cursor:pointer;transition:all .25s;box-shadow:0 0 30px rgba(59,130,246,0.35);}
+.btn-primary:hover{background:var(--blue2);transform:translateY(-2px);}
+.btn-outline{background:transparent;border:1px solid var(--border2);color:var(--text);padding:15px 32px;border-radius:var(--r);font-size:15px;font-weight:500;cursor:pointer;transition:all .25s;}
 .btn-outline:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-bg);}
-
-/* stats row */
-.stats-bar{
-  display:flex;gap:0;
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:var(--r2);overflow:hidden;
-  max-width:600px;width:100%;
-}
-.stat-item{
-  flex:1;padding:20px;text-align:center;
-  border-right:1px solid var(--border);
-}
+.stats-bar{display:flex;background:var(--card);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;max-width:600px;width:100%;}
+.stat-item{flex:1;padding:20px;text-align:center;border-right:1px solid var(--border);}
 .stat-item:last-child{border-right:none;}
-.stat-num{
-  font-family:var(--head);font-size:26px;font-weight:800;
-  color:var(--blue);display:block;
-}
+.stat-num{font-family:var(--head);font-size:26px;font-weight:800;color:var(--blue);display:block;}
 .stat-label{color:var(--text3);font-size:12px;margin-top:2px;}
 
-/* ─── SECTION ─── */
+/* SECTION */
 .section{padding:80px 24px;max-width:1120px;margin:0 auto;}
-.sec-eyebrow{
-  font-size:12px;font-weight:600;letter-spacing:0.1em;
-  color:var(--blue);text-transform:uppercase;margin-bottom:12px;
-}
-.sec-title{
-  font-family:var(--head);
-  font-size:clamp(26px,4vw,44px);
-  font-weight:800;line-height:1.15;
-  letter-spacing:-0.02em;margin-bottom:14px;
-}
+.sec-eyebrow{font-size:12px;font-weight:600;letter-spacing:0.1em;color:var(--blue);text-transform:uppercase;margin-bottom:12px;}
+.sec-title{font-family:var(--head);font-size:clamp(26px,4vw,44px);font-weight:800;line-height:1.15;letter-spacing:-0.02em;margin-bottom:14px;}
 .sec-title span{color:var(--blue);}
 .sec-desc{color:var(--text2);font-size:16px;max-width:520px;line-height:1.75;margin-bottom:52px;}
 
-/* ─── TOOLS GRID ─── */
-.tools-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-  gap:16px;
-}
-.tool-card{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:var(--r2);padding:28px 24px;
-  cursor:pointer;transition:all .28s;
-  position:relative;overflow:hidden;
-}
-.tool-card::after{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,rgba(59,130,246,0.05),transparent 60%);
-  opacity:0;transition:opacity .28s;
-}
+/* TOOLS GRID */
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;}
+.tool-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:28px 24px;cursor:pointer;transition:all .28s;position:relative;overflow:hidden;}
+.tool-card::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(59,130,246,0.05),transparent 60%);opacity:0;transition:opacity .28s;}
 .tool-card:hover{border-color:rgba(59,130,246,0.35);transform:translateY(-3px);box-shadow:0 12px 40px rgba(59,130,246,0.1);}
 .tool-card:hover::after{opacity:1;}
 .tool-card.disabled{opacity:.45;cursor:not-allowed;}
 .tool-card.disabled:hover{transform:none;border-color:var(--border);box-shadow:none;}
-.tool-icon-wrap{
-  width:48px;height:48px;border-radius:12px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:22px;margin-bottom:18px;
-  position:relative;z-index:1;
-}
+.tool-icon-wrap{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:18px;position:relative;z-index:1;}
 .ic-blue{background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.2);}
 .ic-cyan{background:rgba(56,189,248,0.12);border:1px solid rgba(56,189,248,0.2);}
 .ic-indigo{background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.2);}
 .ic-slate{background:rgba(71,85,105,0.2);border:1px solid rgba(71,85,105,0.25);}
-.tool-card h3{
-  font-family:var(--head);font-size:14px;font-weight:700;
-  letter-spacing:0.02em;margin-bottom:8px;position:relative;z-index:1;
-}
+.tool-card h3{font-family:var(--head);font-size:14px;font-weight:700;letter-spacing:0.02em;margin-bottom:8px;position:relative;z-index:1;}
 .tool-card p{color:var(--text2);font-size:13px;margin-bottom:20px;line-height:1.6;position:relative;z-index:1;}
-.cs-badge{
-  display:inline-block;font-size:10px;font-weight:600;
-  letter-spacing:0.06em;color:var(--text3);
-  border:1px solid var(--border);
-  padding:2px 8px;border-radius:4px;margin-left:8px;vertical-align:middle;
-}
-.tool-cta{
-  display:block;width:100%;text-align:center;
-  background:var(--bg);border:1px solid var(--border2);
-  color:var(--text2);padding:10px;border-radius:var(--r);
-  font-size:12px;font-weight:600;letter-spacing:0.04em;
-  cursor:pointer;transition:all .2s;position:relative;z-index:1;
-}
+.cs-badge{display:inline-block;font-size:10px;font-weight:600;letter-spacing:0.06em;color:var(--text3);border:1px solid var(--border);padding:2px 8px;border-radius:4px;margin-left:8px;vertical-align:middle;}
+.tool-cta{display:block;width:100%;text-align:center;background:var(--bg);border:1px solid var(--border2);color:var(--text2);padding:10px;border-radius:var(--r);font-size:12px;font-weight:600;letter-spacing:0.04em;cursor:pointer;transition:all .2s;position:relative;z-index:1;}
 .tool-cta:hover{background:var(--blue-bg);border-color:var(--blue);color:var(--blue);}
 .tool-cta:disabled{opacity:.4;cursor:not-allowed;}
 
-/* ─── HOW IT WORKS ─── */
+/* STEPS */
 .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0;position:relative;}
-.steps::before{
-  content:'';position:absolute;top:28px;left:10%;right:10%;
-  height:1px;background:linear-gradient(90deg,transparent,var(--border),var(--border),transparent);
-}
+.steps::before{content:'';position:absolute;top:28px;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,var(--border),var(--border),transparent);}
 .step{text-align:center;padding:0 16px;position:relative;}
-.step-num{
-  width:56px;height:56px;border-radius:50%;
-  background:var(--card);border:1px solid var(--border);
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--head);font-size:20px;font-weight:800;color:var(--blue);
-  margin:0 auto 20px;position:relative;z-index:1;
-  box-shadow:0 0 20px rgba(59,130,246,0.15);
-}
+.step-num{width:56px;height:56px;border-radius:50%;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--head);font-size:20px;font-weight:800;color:var(--blue);margin:0 auto 20px;position:relative;z-index:1;box-shadow:0 0 20px rgba(59,130,246,0.15);}
 .step h4{font-family:var(--head);font-size:15px;font-weight:700;margin-bottom:6px;}
 .step p{color:var(--text2);font-size:13px;line-height:1.6;}
 
-/* ─── TOOL PAGE ─── */
+/* TOOL PAGE */
 .tool-page{max-width:780px;margin:0 auto;padding:48px 24px;}
 .tool-header{text-align:center;margin-bottom:36px;}
-.tool-header h1{
-  font-family:var(--head);font-size:clamp(22px,4vw,34px);
-  font-weight:800;letter-spacing:-0.02em;margin-bottom:6px;
-}
+.tool-header h1{font-family:var(--head);font-size:clamp(22px,4vw,34px);font-weight:800;letter-spacing:-0.02em;margin-bottom:6px;}
 .tool-header h1 span{color:var(--blue);}
 .tool-header p{color:var(--text3);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;}
 
-/* api key banner */
-.api-banner{
-  background:rgba(234,179,8,0.07);
-  border:1px solid rgba(234,179,8,0.18);
-  border-radius:var(--r);padding:14px 18px;
-  display:flex;align-items:flex-start;gap:12px;margin-bottom:20px;
-}
-.api-banner-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
-.api-banner-body{flex:1;}
+/* token info */
+.tok-info{display:flex;align-items:center;justify-content:space-between;background:var(--blue-bg);border:1px solid rgba(59,130,246,0.15);border-radius:var(--r);padding:10px 16px;margin-bottom:18px;font-size:13px;}
+.tok-info .left{color:var(--text2);}
+.tok-info .right{color:var(--blue);font-weight:700;}
+
+/* api banner */
+.api-banner{background:rgba(234,179,8,0.07);border:1px solid rgba(234,179,8,0.18);border-radius:var(--r);padding:14px 18px;display:flex;align-items:flex-start;gap:12px;margin-bottom:20px;}
+.api-banner-icon{font-size:18px;flex-shrink:0;}
 .api-banner-body strong{color:#fbbf24;font-size:13px;font-weight:600;}
 .api-banner-body p{color:#d97706;font-size:12px;margin-top:2px;line-height:1.5;}
 .api-input-row{display:flex;gap:8px;margin-top:10px;}
-.api-input{
-  flex:1;background:rgba(0,0,0,0.3);
-  border:1px solid rgba(234,179,8,0.3);
-  color:var(--text);padding:8px 12px;
-  border-radius:8px;font-size:12px;font-family:monospace;
-  letter-spacing:0.04em;
-}
+.api-input{flex:1;background:rgba(0,0,0,0.3);border:1px solid rgba(234,179,8,0.3);color:var(--text);padding:8px 12px;border-radius:8px;font-size:12px;font-family:monospace;}
 .api-input:focus{outline:none;border-color:#fbbf24;}
-.api-save-btn{
-  background:#fbbf24;border:none;color:#000;
-  padding:8px 16px;border-radius:8px;
-  font-size:12px;font-weight:700;cursor:pointer;
-  white-space:nowrap;
-}
+.api-save-btn{background:#fbbf24;border:none;color:#000;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;}
 
 /* upload */
-.upload-zone{
-  border:2px dashed var(--border2);border-radius:var(--r2);
-  padding:64px 40px;text-align:center;
-  cursor:pointer;transition:all .25s;
-  background:var(--card);position:relative;margin-bottom:18px;
-}
-.upload-zone:hover,.upload-zone.drag-over{
-  border-color:rgba(59,130,246,0.5);
-  background:rgba(59,130,246,0.03);
-}
+.upload-zone{border:2px dashed var(--border2);border-radius:var(--r2);padding:64px 40px;text-align:center;cursor:pointer;transition:all .25s;background:var(--card);position:relative;margin-bottom:18px;}
+.upload-zone:hover,.upload-zone.drag-over{border-color:rgba(59,130,246,0.5);background:rgba(59,130,246,0.03);}
 .upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;}
-.upload-icon-box{
-  width:54px;height:54px;border-radius:14px;
-  background:var(--bg3);border:1px solid var(--border);
-  display:flex;align-items:center;justify-content:center;
-  margin:0 auto 16px;font-size:22px;
-}
+.upload-icon-box{width:54px;height:54px;border-radius:14px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:22px;}
 .upload-zone h3{font-family:var(--head);font-size:15px;font-weight:700;margin-bottom:6px;}
 .upload-zone p{color:var(--text3);font-size:12px;letter-spacing:0.04em;}
-.preview-box{
-  position:relative;border-radius:var(--r2);overflow:hidden;
-  border:1px solid var(--border);margin-bottom:18px;
-}
+.preview-box{position:relative;border-radius:var(--r2);overflow:hidden;border:1px solid var(--border);margin-bottom:18px;}
 .preview-box img,.preview-box video{width:100%;max-height:320px;object-fit:contain;background:var(--bg3);display:block;}
-.remove-btn{
-  position:absolute;top:10px;right:10px;
-  background:rgba(0,0,0,0.75);border:1px solid var(--border);
-  color:var(--text2);width:32px;height:32px;border-radius:8px;
-  cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;
-  transition:all .2s;
-}
+.remove-btn{position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.75);border:1px solid var(--border);color:var(--text2);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
 .remove-btn:hover{background:rgba(220,38,38,.5);color:#fff;}
-
-/* options */
 .opts-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;}
-.opt-label{
-  display:block;font-size:11px;font-weight:600;
-  letter-spacing:0.08em;color:var(--text3);
-  text-transform:uppercase;margin-bottom:8px;
-}
-.sel{
-  width:100%;background:var(--card);border:1px solid var(--border2);
-  color:var(--text);padding:11px 14px;border-radius:var(--r);
-  font-family:var(--body);font-size:14px;cursor:pointer;
-  appearance:none;-webkit-appearance:none;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23475569' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:right 12px center;
-  transition:border-color .2s;
-}
+.opt-label{display:block;font-size:11px;font-weight:600;letter-spacing:0.08em;color:var(--text3);text-transform:uppercase;margin-bottom:8px;}
+.sel{width:100%;background:var(--card);border:1px solid var(--border2);color:var(--text);padding:11px 14px;border-radius:var(--r);font-family:var(--body);font-size:14px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23475569' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;transition:border-color .2s;}
 .sel:focus{outline:none;border-color:var(--blue);}
 .toggle-row{display:flex;background:var(--card);border:1px solid var(--border2);border-radius:var(--r);overflow:hidden;}
-.tog{
-  flex:1;padding:11px;background:transparent;border:none;
-  color:var(--text3);font-family:var(--body);font-size:13px;font-weight:500;
-  cursor:pointer;transition:all .2s;
-  display:flex;align-items:center;justify-content:center;gap:6px;
-}
+.tog{flex:1;padding:11px;background:transparent;border:none;color:var(--text3);font-family:var(--body);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px;}
 .tog.on{background:var(--blue);color:#fff;font-weight:600;}
 .tog:hover:not(.on){color:var(--text);}
-
-/* generate button */
-.gen-btn{
-  width:100%;padding:16px;background:var(--blue);border:none;
-  border-radius:var(--r);color:#fff;
-  font-family:var(--body);font-size:14px;font-weight:600;
-  cursor:pointer;transition:all .25s;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  box-shadow:0 0 24px rgba(59,130,246,0.3);margin-bottom:12px;
-}
-.gen-btn:hover{background:var(--blue2);box-shadow:0 0 32px rgba(59,130,246,0.45);}
+.gen-btn{width:100%;padding:16px;background:var(--blue);border:none;border-radius:var(--r);color:#fff;font-family:var(--body);font-size:14px;font-weight:600;cursor:pointer;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 0 24px rgba(59,130,246,0.3);margin-bottom:12px;}
+.gen-btn:hover{background:var(--blue2);}
 .gen-btn:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;}
-
-/* result */
-.result-box{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:var(--r2);overflow:hidden;margin-top:22px;
-}
-.result-head{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:13px 18px;border-bottom:1px solid var(--border);
-}
+.result-box{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;margin-top:22px;}
+.result-head{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;border-bottom:1px solid var(--border);}
 .result-head span{font-size:11px;font-weight:600;letter-spacing:0.08em;color:var(--text3);text-transform:uppercase;}
-.copy-btn{
-  display:flex;align-items:center;gap:6px;
-  background:transparent;border:1px solid var(--border2);
-  color:var(--text2);padding:6px 12px;border-radius:7px;
-  font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;
-}
+.copy-btn{display:flex;align-items:center;gap:6px;background:transparent;border:1px solid var(--border2);color:var(--text2);padding:6px 12px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;}
 .copy-btn:hover{border-color:var(--blue);color:var(--blue);}
 .copy-btn.ok{border-color:var(--blue);color:var(--blue);}
 .result-body{padding:22px;}
 .spin-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:44px;gap:14px;}
-.spin{
-  width:36px;height:36px;border-radius:50%;
-  border:2px solid var(--border);border-top-color:var(--blue);
-  animation:spin .8s linear infinite;
-}
+.spin{width:36px;height:36px;border-radius:50%;border:2px solid var(--border);border-top-color:var(--blue);animation:spin .8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
 .spin-wrap p{font-size:12px;color:var(--text3);letter-spacing:0.06em;font-weight:600;}
 .res-text{color:var(--text2);font-size:14px;line-height:1.9;white-space:pre-wrap;}
 .res-json{color:#7dd3fc;font-size:12.5px;font-family:monospace;line-height:1.7;white-space:pre-wrap;overflow-x:auto;}
 
-/* ─── AUTH ─── */
+/* AUTH */
 .auth-wrap{min-height:calc(100vh - 64px);display:flex;align-items:center;justify-content:center;padding:40px 24px;}
-.auth-box{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:var(--r2);padding:44px 40px;width:100%;max-width:430px;
-}
-.back-btn{
-  display:flex;align-items:center;gap:6px;
-  color:var(--text3);font-size:12px;font-weight:600;
-  letter-spacing:0.06em;cursor:pointer;margin-bottom:28px;
-  background:none;border:none;transition:color .2s;
-}
+.auth-box{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:44px 40px;width:100%;max-width:430px;}
+.back-btn{display:flex;align-items:center;gap:6px;color:var(--text3);font-size:12px;font-weight:600;letter-spacing:0.06em;cursor:pointer;margin-bottom:28px;background:none;border:none;transition:color .2s;}
 .back-btn:hover{color:var(--text2);}
 .auth-box h2{font-family:var(--head);font-size:30px;font-weight:800;margin-bottom:6px;}
 .auth-box .sub{color:var(--text2);font-size:14px;margin-bottom:28px;}
 .field{margin-bottom:18px;}
 .field label{display:block;font-size:11px;font-weight:600;letter-spacing:0.08em;color:var(--text3);text-transform:uppercase;margin-bottom:8px;}
-.finput{
-  width:100%;background:var(--bg);border:1px solid var(--border2);
-  color:var(--text);padding:12px 14px;border-radius:var(--r);
-  font-family:var(--body);font-size:14px;transition:border-color .2s;
-}
+.finput{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:12px 14px;border-radius:var(--r);font-family:var(--body);font-size:14px;transition:border-color .2s;}
 .finput:focus{outline:none;border-color:var(--blue);}
 .finput::placeholder{color:var(--text3);}
 .fwrap{position:relative;}
 .eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:4px;transition:color .2s;}
-.eye:hover{color:var(--text2);}
-.err-box{
-  background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);
-  color:#f87171;padding:10px 14px;border-radius:var(--r);
-  font-size:13px;margin-bottom:16px;display:none;
-}
-.divline{
-  display:flex;align-items:center;gap:12px;
-  color:var(--text3);font-size:12px;margin:20px 0;
-}
+.err-box{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#f87171;padding:10px 14px;border-radius:var(--r);font-size:13px;margin-bottom:16px;display:none;}
+.success-box{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);color:#4ade80;padding:10px 14px;border-radius:var(--r);font-size:13px;margin-bottom:16px;display:none;}
+.divline{display:flex;align-items:center;gap:12px;color:var(--text3);font-size:12px;margin:20px 0;}
 .divline::before,.divline::after{content:'';flex:1;height:1px;background:var(--border);}
 .auth-switch{text-align:center;color:var(--text2);font-size:13px;}
 .auth-switch a{color:var(--blue);font-weight:600;cursor:pointer;text-decoration:none;}
-.auth-switch a:hover{text-decoration:underline;}
 
-/* ─── PRICING ─── */
-.pricing-pg{max-width:1000px;margin:0 auto;padding:64px 24px;}
-.pricing-head{text-align:center;margin-bottom:56px;}
-.pricing-head h1{font-family:var(--head);font-size:clamp(28px,5vw,48px);font-weight:800;letter-spacing:-0.02em;margin-bottom:10px;}
-.pricing-head p{color:var(--text2);font-size:16px;}
-
-/* tab switch */
-.tab-switch{
-  display:inline-flex;background:var(--card);
-  border:1px solid var(--border);border-radius:var(--r);
-  overflow:hidden;margin-bottom:44px;
-}
-.tab-btn{
-  padding:10px 28px;background:transparent;border:none;
-  color:var(--text2);font-family:var(--body);font-size:14px;font-weight:500;
-  cursor:pointer;transition:all .2s;
-}
-.tab-btn.on{background:var(--blue);color:#fff;font-weight:600;}
-.tab-content{display:none;}
-.tab-content.on{display:block;}
-
-/* token cards */
-.token-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px;}
-.tok-card{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:var(--r2);padding:24px 20px;
-  cursor:pointer;transition:all .2s;position:relative;
-}
-.tok-card:hover{border-color:rgba(59,130,246,.35);}
-.tok-card.picked{border-color:var(--blue);box-shadow:0 0 24px rgba(59,130,246,.15);}
-.tok-card.featured-card{border-color:rgba(59,130,246,.3);}
-.tok-badge{
-  position:absolute;top:-10px;left:50%;transform:translateX(-50%);
-  background:var(--blue);color:#fff;padding:3px 12px;
-  border-radius:999px;font-size:10px;font-weight:700;
-  letter-spacing:.06em;white-space:nowrap;
-}
-.tok-name{font-size:12px;font-weight:600;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;}
-.tok-price{font-family:var(--head);font-size:26px;font-weight:800;margin-bottom:2px;}
-.tok-orig{font-size:12px;color:var(--text3);text-decoration:line-through;margin-right:6px;}
-.disc{background:var(--blue);color:#fff;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;vertical-align:middle;}
-.tok-sub{color:var(--text3);font-size:12px;margin-bottom:16px;}
-.hr-thin{border:none;border-top:1px solid var(--border);margin:14px 0;}
-.tok-feats{list-style:none;margin-bottom:18px;}
-.tok-feats li{display:flex;align-items:flex-start;gap:7px;color:var(--text2);font-size:12px;padding:3px 0;line-height:1.5;}
-.tok-feats li::before{content:'✓';color:var(--blue);font-weight:700;flex-shrink:0;margin-top:1px;}
-.tok-feats li.star::before{content:'★';color:#f59e0b;}
-.btn-choose{
-  width:100%;padding:11px;border-radius:var(--r);
-  font-family:var(--body);font-size:12px;font-weight:600;
-  cursor:pointer;transition:all .2s;
-  background:var(--bg);border:1px solid var(--border2);color:var(--text);
-}
-.btn-choose:hover{background:var(--blue-bg);border-color:var(--blue);color:var(--blue);}
-.btn-choose.feat{background:var(--blue);border-color:var(--blue);color:#fff;}
-.btn-choose.feat:hover{background:var(--blue2);}
-
-/* sub cards */
-.sub-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-bottom:20px;}
-.sub-card{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:var(--r2);padding:28px 24px;
-  cursor:pointer;transition:all .2s;position:relative;
-}
-.sub-card.featured-card{border-color:rgba(59,130,246,.3);}
-.sub-card:hover{border-color:rgba(59,130,246,.35);}
-.sub-card.picked{border-color:var(--blue);box-shadow:0 0 24px rgba(59,130,246,.15);}
-.sub-plan{font-family:var(--head);font-size:20px;font-weight:800;margin-bottom:4px;}
-.sub-price{font-family:var(--head);font-size:34px;font-weight:800;margin:10px 0 2px;}
-.sub-price span{font-size:16px;font-weight:400;color:var(--text3);}
-.sub-desc{color:var(--text2);font-size:13px;margin-bottom:20px;line-height:1.6;}
-.sub-feats{list-style:none;margin-bottom:22px;}
-.sub-feats li{display:flex;align-items:flex-start;gap:8px;color:var(--text2);font-size:13px;padding:4px 0;}
-.sub-feats li::before{content:'✓';color:var(--blue);font-weight:700;flex-shrink:0;margin-top:1px;}
-
-/* payment */
-.pay-section{margin-top:32px;background:var(--card);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;}
-.pay-head{
-  background:var(--blue-bg);border-bottom:1px solid rgba(59,130,246,.15);
-  padding:16px 22px;
-  font-family:var(--head);font-size:14px;font-weight:700;color:var(--blue);
-}
-.pay-body{padding:22px;}
-.pay-method{
-  display:flex;align-items:flex-start;gap:14px;
-  background:var(--bg);border:1px solid var(--border);
-  border-radius:var(--r);padding:16px;margin-bottom:14px;
-}
-.pay-icon{
-  width:38px;height:38px;border-radius:9px;
-  background:var(--blue-bg);border:1px solid rgba(59,130,246,.2);
-  display:flex;align-items:center;justify-content:center;
-  font-size:16px;color:var(--blue);flex-shrink:0;
-}
-.pay-method h4{font-weight:600;font-size:13px;margin-bottom:3px;}
-.pay-method p{color:var(--text2);font-size:12px;line-height:1.5;}
-.btn-pay{
-  width:100%;padding:14px;background:var(--blue);border:none;
-  border-radius:var(--r);color:#fff;
-  font-family:var(--body);font-size:14px;font-weight:600;
-  cursor:pointer;transition:all .2s;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  box-shadow:0 0 20px rgba(59,130,246,.25);
-}
-.btn-pay:hover{background:var(--blue2);}
-.btn-wa{
-  width:100%;margin-top:10px;padding:12px;
-  background:transparent;border:1px solid var(--border2);
-  color:var(--text2);border-radius:var(--r);
-  font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-}
-.btn-wa:hover{border-color:#25d366;color:#25d366;}
-
-/* ─── DASHBOARD ─── */
+/* DASHBOARD */
 .dash-pg{max-width:1020px;margin:0 auto;padding:48px 24px;}
 .dash-greeting h2{font-family:var(--head);font-size:24px;font-weight:800;margin-bottom:6px;}
 .dash-greeting p{color:var(--text2);font-size:14px;margin-bottom:32px;}
@@ -599,7 +195,104 @@ nav{
 .scard .val{font-family:var(--head);font-size:30px;font-weight:800;color:var(--blue);}
 .scard .val.sm{font-size:16px;color:var(--text2);margin-top:4px;}
 
-/* ─── ABOUT ─── */
+/* HISTORY TABLE */
+.history-section{margin-top:36px;}
+.history-section h3{font-family:var(--head);font-size:16px;font-weight:700;margin-bottom:16px;}
+.table-wrap{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;}
+table{width:100%;border-collapse:collapse;}
+thead th{padding:12px 16px;text-align:left;font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--bg2);}
+tbody td{padding:12px 16px;font-size:13px;color:var(--text2);border-bottom:1px solid var(--border);}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover td{background:var(--bg2);}
+.badge-type{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;}
+.badge-img{background:rgba(59,130,246,0.15);color:var(--blue);}
+.badge-sh{background:rgba(56,189,248,0.12);color:var(--accent);}
+.badge-lv{background:rgba(99,102,241,0.12);color:#a5b4fc;}
+.empty-table{text-align:center;padding:40px;color:var(--text3);font-size:14px;}
+
+/* PRICING */
+.pricing-pg{max-width:1000px;margin:0 auto;padding:64px 24px;}
+.pricing-head{text-align:center;margin-bottom:56px;}
+.pricing-head h1{font-family:var(--head);font-size:clamp(28px,5vw,48px);font-weight:800;letter-spacing:-0.02em;margin-bottom:10px;}
+.pricing-head p{color:var(--text2);font-size:16px;}
+.tab-switch{display:inline-flex;background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:44px;}
+.tab-btn{padding:10px 28px;background:transparent;border:none;color:var(--text2);font-family:var(--body);font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;}
+.tab-btn.on{background:var(--blue);color:#fff;font-weight:600;}
+.tab-content{display:none;}
+.tab-content.on{display:block;}
+.token-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px;}
+.tok-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:24px 20px;cursor:pointer;transition:all .2s;position:relative;}
+.tok-card:hover{border-color:rgba(59,130,246,.35);}
+.tok-card.picked{border-color:var(--blue);box-shadow:0 0 24px rgba(59,130,246,.15);}
+.tok-badge{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--blue);color:#fff;padding:3px 12px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.06em;white-space:nowrap;}
+.tok-name{font-size:12px;font-weight:600;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;}
+.tok-price{font-family:var(--head);font-size:26px;font-weight:800;margin-bottom:2px;}
+.tok-orig{font-size:12px;color:var(--text3);text-decoration:line-through;margin-right:6px;}
+.disc{background:var(--blue);color:#fff;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;vertical-align:middle;}
+.tok-sub{color:var(--text3);font-size:12px;margin-bottom:16px;}
+.hr-thin{border:none;border-top:1px solid var(--border);margin:14px 0;}
+.tok-feats{list-style:none;margin-bottom:18px;}
+.tok-feats li{display:flex;align-items:flex-start;gap:7px;color:var(--text2);font-size:12px;padding:3px 0;line-height:1.5;}
+.tok-feats li::before{content:'✓';color:var(--blue);font-weight:700;flex-shrink:0;}
+.tok-feats li.star::before{content:'★';color:#f59e0b;}
+.btn-choose{width:100%;padding:11px;border-radius:var(--r);font-family:var(--body);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;background:var(--bg);border:1px solid var(--border2);color:var(--text);}
+.btn-choose:hover{background:var(--blue-bg);border-color:var(--blue);color:var(--blue);}
+.btn-choose.feat{background:var(--blue);border-color:var(--blue);color:#fff;}
+.btn-choose.feat:hover{background:var(--blue2);}
+.sub-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-bottom:20px;}
+.sub-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:28px 24px;cursor:pointer;transition:all .2s;position:relative;}
+.sub-card.featured-card{border-color:rgba(59,130,246,.3);}
+.sub-card:hover{border-color:rgba(59,130,246,.35);}
+.sub-card.picked{border-color:var(--blue);box-shadow:0 0 24px rgba(59,130,246,.15);}
+.sub-plan{font-family:var(--head);font-size:20px;font-weight:800;margin-bottom:4px;}
+.sub-price{font-family:var(--head);font-size:34px;font-weight:800;margin:10px 0 2px;}
+.sub-price span{font-size:16px;font-weight:400;color:var(--text3);}
+.sub-desc{color:var(--text2);font-size:13px;margin-bottom:20px;line-height:1.6;}
+.sub-feats{list-style:none;margin-bottom:22px;}
+.sub-feats li{display:flex;align-items:flex-start;gap:8px;color:var(--text2);font-size:13px;padding:4px 0;}
+.sub-feats li::before{content:'✓';color:var(--blue);font-weight:700;flex-shrink:0;}
+.pay-section{margin-top:32px;background:var(--card);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;}
+.pay-head{background:var(--blue-bg);border-bottom:1px solid rgba(59,130,246,.15);padding:16px 22px;font-family:var(--head);font-size:14px;font-weight:700;color:var(--blue);}
+.pay-body{padding:22px;}
+.pay-method{display:flex;align-items:flex-start;gap:14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:14px;}
+.pay-icon{width:38px;height:38px;border-radius:9px;background:var(--blue-bg);border:1px solid rgba(59,130,246,.2);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--blue);flex-shrink:0;}
+.pay-method h4{font-weight:600;font-size:13px;margin-bottom:3px;}
+.pay-method p{color:var(--text2);font-size:12px;line-height:1.5;}
+.btn-pay{width:100%;padding:14px;background:var(--blue);border:none;border-radius:var(--r);color:#fff;font-family:var(--body);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 0 20px rgba(59,130,246,.25);}
+.btn-pay:hover{background:var(--blue2);}
+.btn-wa{width:100%;margin-top:10px;padding:12px;background:transparent;border:1px solid var(--border2);color:var(--text2);border-radius:var(--r);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-wa:hover{border-color:#25d366;color:#25d366;}
+
+/* ADMIN */
+.admin-pg{max-width:1100px;margin:0 auto;padding:48px 24px;}
+.admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:16px;}
+.admin-header h1{font-family:var(--head);font-size:24px;font-weight:800;}
+.admin-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:32px;}
+.admin-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:18px 20px;}
+.admin-card small{display:block;font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--text3);text-transform:uppercase;margin-bottom:8px;}
+.admin-card .val{font-family:var(--head);font-size:28px;font-weight:800;color:var(--blue);}
+.admin-section{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;margin-bottom:24px;}
+.admin-section-head{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);background:var(--bg2);}
+.admin-section-head h3{font-family:var(--head);font-size:14px;font-weight:700;}
+.search-input{background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:8px 12px;border-radius:var(--r);font-size:13px;width:220px;}
+.search-input:focus{outline:none;border-color:var(--blue);}
+.add-tok-form{display:flex;gap:8px;align-items:center;}
+.add-tok-form input{background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:8px 12px;border-radius:var(--r);font-size:13px;width:80px;}
+.add-tok-form input:focus{outline:none;border-color:var(--blue);}
+.btn-sm{padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all .2s;}
+.btn-sm-blue{background:var(--blue);color:#fff;}
+.btn-sm-blue:hover{background:var(--blue2);}
+.btn-sm-green{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.2);}
+.btn-sm-green:hover{background:rgba(34,197,94,.25);}
+.btn-sm-red{background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.15);}
+.btn-sm-red:hover{background:rgba(239,68,68,.2);}
+.user-row td{vertical-align:middle;}
+.status-badge{display:inline-block;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;}
+.status-active{background:rgba(34,197,94,.12);color:#4ade80;}
+.status-pending{background:rgba(234,179,8,.1);color:#fbbf24;}
+.status-done{background:rgba(59,130,246,.12);color:var(--blue);}
+
+/* ABOUT */
 .about-pg{max-width:900px;margin:0 auto;padding:64px 24px;}
 .about-hero h1{font-family:var(--head);font-size:clamp(28px,5vw,48px);font-weight:800;line-height:1.15;letter-spacing:-0.02em;margin-bottom:18px;}
 .about-hero h1 span{color:var(--blue);}
@@ -617,7 +310,7 @@ nav{
 .contact-row small{display:block;font-size:10px;font-weight:600;letter-spacing:.08em;color:var(--text3);text-transform:uppercase;margin-bottom:2px;}
 .contact-row strong{font-size:14px;font-weight:500;}
 
-/* ─── LEGAL ─── */
+/* LEGAL */
 .legal-pg{max-width:700px;margin:0 auto;padding:64px 24px;}
 .legal-pg h1{font-family:var(--head);font-size:30px;font-weight:800;margin-bottom:6px;}
 .legal-date{font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--text3);text-transform:uppercase;margin-bottom:36px;display:block;}
@@ -627,7 +320,7 @@ nav{
 .legal-sec ul{padding-left:20px;}
 .legal-sec ul li{color:var(--text2);font-size:14px;line-height:1.8;margin-bottom:4px;}
 
-/* ─── FOOTER ─── */
+/* FOOTER */
 footer{border-top:1px solid var(--border);padding:48px 32px 32px;margin-top:80px;}
 .foot-inner{max-width:1120px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-start;gap:32px;flex-wrap:wrap;}
 .foot-brand .logo{display:flex;align-items:center;gap:10px;font-family:var(--head);font-size:18px;font-weight:800;margin-bottom:10px;}
@@ -639,42 +332,43 @@ footer{border-top:1px solid var(--border);padding:48px 32px 32px;margin-top:80px
 .foot-bottom{max-width:1120px;margin:24px auto 0;padding-top:20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
 .foot-bottom p{color:var(--text3);font-size:12px;}
 
-/* ─── MODAL ─── */
+/* MODAL */
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center;padding:20px;}
 .modal-bg.open{display:flex;}
-.modal{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);width:100%;max-width:480px;max-height:80vh;overflow-y:auto;}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);width:100%;max-width:500px;max-height:85vh;overflow-y:auto;}
 .modal-hd{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--card);}
-.modal-hd h3{font-family:var(--head);font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;}
+.modal-hd h3{font-family:var(--head);font-size:15px;font-weight:700;}
 .modal-x{background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer;line-height:1;transition:color .2s;}
 .modal-x:hover{color:var(--text);}
 .modal-bd{padding:24px 20px;}
-.empty{text-align:center;padding:40px;color:var(--text3);font-size:14px;}
 
-/* ─── TOAST ─── */
-.toast{
-  position:fixed;bottom:24px;right:24px;
-  background:var(--bg3);border:1px solid var(--blue);
-  color:var(--text);padding:12px 18px;border-radius:var(--r);
-  font-size:13px;font-weight:500;z-index:300;
-  transform:translateY(80px);opacity:0;transition:all .3s;
-  display:flex;align-items:center;gap:8px;
-  box-shadow:0 8px 32px rgba(59,130,246,.2);
-  max-width:340px;
-}
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--bg3);border:1px solid var(--blue);color:var(--text);padding:12px 18px;border-radius:var(--r);font-size:13px;font-weight:500;z-index:300;transform:translateY(80px);opacity:0;transition:all .3s;display:flex;align-items:center;gap:8px;box-shadow:0 8px 32px rgba(59,130,246,.2);max-width:340px;}
 .toast.show{transform:translateY(0);opacity:1;}
+
+/* LOADING OVERLAY */
+.loading-overlay{position:fixed;inset:0;background:rgba(8,12,20,.85);z-index:500;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;}
+.loading-overlay p{color:var(--text2);font-size:14px;font-weight:500;}
 
 @media(max-width:640px){
   nav{padding:0 16px;}
-  .nav-links{display:none;}
+  .nav-links.desktop{display:none;}
   .about-grid,.opts-row{grid-template-columns:1fr;}
   .steps::before{display:none;}
   .steps{gap:24px;}
   .foot-inner{flex-direction:column;}
   .auth-box{padding:32px 24px;}
+  .admin-section-head{flex-direction:column;align-items:flex-start;gap:10px;}
 }
 </style>
 </head>
 <body>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spin" style="width:44px;height:44px;border-width:3px;"></div>
+  <p>Menghubungkan ke server...</p>
+</div>
 
 <!-- NAVBAR -->
 <nav>
@@ -682,495 +376,315 @@ footer{border-top:1px solid var(--border);padding:48px 32px 32px;margin-top:80px
     <div class="logo-icon">PK</div>
     <span>PROMPT</span> KITA
   </div>
-  <div class="nav-links">
+  <div class="nav-links desktop">
     <button class="nav-link" onclick="go('home')">Beranda</button>
     <button class="nav-link" onclick="go('pricing')">Harga</button>
     <button class="nav-link" onclick="go('about')">Tentang</button>
   </div>
   <div class="nav-links" id="navRight">
-    <button class="btn-nav-ghost" onclick="go('login')">Masuk</button>
-    <button class="btn-nav-blue" onclick="go('pricing')">🚀 Mulai Gratis</button>
+    <button class="btn-ghost" onclick="go('login')">Masuk</button>
+    <button class="btn-blue" onclick="go('register')">🚀 Mulai Gratis</button>
   </div>
 </nav>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- TOKEN MODAL -->
-<div class="modal-bg" id="modalToken">
+<!-- MODAL RIWAYAT -->
+<div class="modal-bg" id="modalHistory">
   <div class="modal">
     <div class="modal-hd">
-      <h3>💎 Riwayat Token</h3>
-      <button class="modal-x" onclick="closeM('modalToken')">×</button>
+      <h3>📋 Riwayat Penggunaan</h3>
+      <button class="modal-x" onclick="closeM('modalHistory')">×</button>
     </div>
-    <div class="modal-bd">
-      <div class="empty" id="tokenHistBody">Belum ada riwayat transaksi.</div>
+    <div class="modal-bd" id="modalHistoryBody">
+      <div class="empty-table">Memuat riwayat...</div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════ HOME ═══════════════ -->
+<!-- MODAL TRANSAKSI -->
+<div class="modal-bg" id="modalTx">
+  <div class="modal">
+    <div class="modal-hd">
+      <h3>💎 Riwayat Token</h3>
+      <button class="modal-x" onclick="closeM('modalTx')">×</button>
+    </div>
+    <div class="modal-bd" id="modalTxBody">
+      <div class="empty-table">Memuat data...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ HOME ══ -->
 <div class="page active" id="page-home">
-  <!-- HERO -->
   <section class="hero">
     <div class="hero-glow"></div>
-    <div class="hero-glow2"></div>
-    <div class="badge"><div class="badge-dot"></div> Didukung Gemini AI · Gratis untuk dicoba</div>
+    <div class="badge"><div class="badge-dot"></div>Didukung Gemini AI · Gratis 5 Token saat Daftar</div>
     <h1>Prompt AI <span class="grad">Terbaik</span><br>untuk Kreator Indonesia</h1>
     <p>Upload gambar atau video kamu dan dapatkan prompt AI yang detail, akurat, dan siap pakai — dalam hitungan detik.</p>
     <div class="hero-cta">
       <button class="btn-primary" onclick="go('register')">🚀 Mulai Gratis — 5 Token</button>
-      <button class="btn-outline" onclick="go('tool-image')">Coba Tanpa Daftar</button>
+      <button class="btn-outline" onclick="go('tool-image')">Coba Dulu</button>
     </div>
     <div class="stats-bar">
-      <div class="stat-item"><span class="stat-num" id="sUsers">2.4K+</span><span class="stat-label">Kreator Aktif</span></div>
-      <div class="stat-item"><span class="stat-num" id="sPrompts">18K+</span><span class="stat-label">Prompt Dibuat</span></div>
+      <div class="stat-item"><span class="stat-num" id="statUsers">—</span><span class="stat-label">Kreator Terdaftar</span></div>
+      <div class="stat-item"><span class="stat-num" id="statPrompts">—</span><span class="stat-label">Prompt Dibuat</span></div>
       <div class="stat-item"><span class="stat-num">3</span><span class="stat-label">Jenis Media</span></div>
       <div class="stat-item"><span class="stat-num">⚡</span><span class="stat-label">Real-time AI</span></div>
     </div>
   </section>
-
-  <!-- TOOLS -->
   <div class="section">
     <div class="sec-eyebrow">✦ TOOL AI KAMI</div>
     <h2 class="sec-title">Satu platform,<br><span>semua kebutuhan prompt</span></h2>
     <p class="sec-desc">Tiga tool AI yang dirancang khusus untuk desainer, content creator, dan AI enthusiast Indonesia.</p>
     <div class="tools-grid">
-      <div class="tool-card" onclick="go('tool-image')">
-        <div class="tool-icon-wrap ic-blue">🖼️</div>
-        <h3>PROMPT DARI FOTO & GAMBAR</h3>
-        <p>Upload foto atau ilustrasi, AI langsung analisis dan hasilkan prompt detail. PNG, JPG, WEBP hingga 20MB.</p>
-        <button class="tool-cta">Mulai Sekarang →</button>
-      </div>
-      <div class="tool-card" onclick="go('tool-shorts')">
-        <div class="tool-icon-wrap ic-cyan">▶️</div>
-        <h3>PROMPT DARI SHORTS VIDEO</h3>
-        <p>Analisis video pendek TikTok, Reels, atau YouTube Shorts. MP4, MOV, WEBM hingga 50MB.</p>
-        <button class="tool-cta">Mulai Sekarang →</button>
-      </div>
-      <div class="tool-card" onclick="go('tool-long')">
-        <div class="tool-icon-wrap ic-indigo">🎬</div>
-        <h3>PROMPT DARI LONG VIDEO</h3>
-        <p>Ekstrak prompt dari video panjang hingga 100MB. Cocok untuk YouTube, film pendek, atau tutorial.</p>
-        <button class="tool-cta">Mulai Sekarang →</button>
-      </div>
-      <div class="tool-card disabled">
-        <div class="tool-icon-wrap ic-slate">📚</div>
-        <h3>TIPS PROMPTING <span class="cs-badge">SEGERA HADIR</span></h3>
-        <p>Panduan lengkap cara menulis prompt profesional dan menerapkan AI tools untuk kreator.</p>
-        <button class="tool-cta" disabled>Segera Hadir</button>
-      </div>
+      <div class="tool-card" onclick="go('tool-image')"><div class="tool-icon-wrap ic-blue">🖼️</div><h3>PROMPT DARI FOTO & GAMBAR</h3><p>Upload foto atau ilustrasi, AI analisis dan hasilkan prompt detail. PNG, JPG, WEBP hingga 20MB.</p><button class="tool-cta">Mulai Sekarang →</button></div>
+      <div class="tool-card" onclick="go('tool-shorts')"><div class="tool-icon-wrap ic-cyan">▶️</div><h3>PROMPT DARI SHORTS VIDEO</h3><p>Analisis video pendek TikTok, Reels, atau YouTube Shorts. MP4, MOV, WEBM hingga 50MB.</p><button class="tool-cta">Mulai Sekarang →</button></div>
+      <div class="tool-card" onclick="go('tool-long')"><div class="tool-icon-wrap ic-indigo">🎬</div><h3>PROMPT DARI LONG VIDEO</h3><p>Ekstrak prompt dari video panjang hingga 100MB. Cocok untuk YouTube atau tutorial.</p><button class="tool-cta">Mulai Sekarang →</button></div>
+      <div class="tool-card disabled"><div class="tool-icon-wrap ic-slate">📚</div><h3>TIPS PROMPTING <span class="cs-badge">SEGERA HADIR</span></h3><p>Panduan lengkap cara menulis prompt profesional untuk kreator Indonesia.</p><button class="tool-cta" disabled>Segera Hadir</button></div>
     </div>
   </div>
-
-  <!-- HOW IT WORKS -->
   <div class="section" style="text-align:center;">
     <div class="sec-eyebrow">✦ CARA KERJA</div>
     <h2 class="sec-title" style="margin:0 auto 12px;">Tiga langkah,<br><span>prompt siap pakai</span></h2>
-    <p class="sec-desc" style="margin:0 auto 56px;">Tidak perlu keahlian teknis. Upload, pilih opsi, dan dapatkan hasilnya.</p>
+    <p class="sec-desc" style="margin:0 auto 56px;">Tidak perlu keahlian teknis. Upload, pilih opsi, dapat hasilnya.</p>
     <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <h4>Upload File</h4>
-        <p>Upload gambar atau video dari perangkat kamu. Drag & drop atau klik untuk pilih file.</p>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <h4>Pilih Opsi</h4>
-        <p>Tentukan bahasa output (Indonesia/English) dan format (Teks atau JSON).</p>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <h4>Dapatkan Prompt</h4>
-        <p>AI menganalisis file kamu dan menghasilkan prompt detail dalam hitungan detik.</p>
-      </div>
+      <div class="step"><div class="step-num">1</div><h4>Upload File</h4><p>Upload gambar atau video. Drag & drop atau klik untuk pilih.</p></div>
+      <div class="step"><div class="step-num">2</div><h4>Pilih Opsi</h4><p>Pilih bahasa output dan format (Teks atau JSON).</p></div>
+      <div class="step"><div class="step-num">3</div><h4>Dapat Prompt</h4><p>AI analisis dan hasilkan prompt detail dalam hitungan detik.</p></div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════ DASHBOARD ═══════════════ -->
+<!-- ══ DASHBOARD ══ -->
 <div class="page" id="page-dashboard">
   <div class="dash-pg">
     <div class="dash-greeting">
       <h2 id="dashHi">Selamat datang! 👋</h2>
-      <p>Pilih tool AI yang ingin kamu gunakan hari ini.</p>
+      <p id="dashSub">Pilih tool AI yang ingin kamu gunakan hari ini.</p>
     </div>
     <div class="stats-row">
-      <div class="scard"><small>Token Tersisa</small><div class="val" id="dTok">0</div></div>
-      <div class="scard"><small>Prompt Dibuat</small><div class="val" id="dPro">0</div></div>
-      <div class="scard"><small>Status Akun</small><div class="val sm" id="dStat">Tamu</div></div>
+      <div class="scard"><small>Token Tersisa</small><div class="val" id="dTok">—</div></div>
+      <div class="scard"><small>Total Prompt</small><div class="val" id="dPro">—</div></div>
+      <div class="scard"><small>Paket</small><div class="val sm" id="dPlan">—</div></div>
+      <div class="scard"><small>Bergabung</small><div class="val sm" id="dJoin">—</div></div>
     </div>
-    <div class="tools-grid">
-      <div class="tool-card" onclick="go('tool-image')">
-        <div class="tool-icon-wrap ic-blue">🖼️</div>
-        <h3>PROMPT DARI FOTO & GAMBAR</h3>
-        <p>Hasilkan prompt dari gambar yang di upload.</p>
-        <button class="tool-cta">Mulai Sekarang →</button>
-      </div>
-      <div class="tool-card" onclick="go('tool-shorts')">
-        <div class="tool-icon-wrap ic-cyan">▶️</div>
-        <h3>PROMPT DARI SHORTS VIDEO</h3>
-        <p>Hasilkan prompt dari shorts video yang di upload.</p>
-        <button class="tool-cta">Mulai Sekarang →</button>
-      </div>
-      <div class="tool-card" onclick="go('tool-long')">
-        <div class="tool-icon-wrap ic-indigo">🎬</div>
-        <h3>PROMPT DARI LONG VIDEO</h3>
-        <p>Hasilkan prompt dari long video yang di upload.</p>
-        <button class="tool-cta">Mulai Sekarang →</button>
-      </div>
-      <div class="tool-card disabled">
-        <div class="tool-icon-wrap ic-slate">📚</div>
-        <h3>TIPS PROMPTING <span class="cs-badge">SEGERA HADIR</span></h3>
-        <p>Panduan lengkap cara menulis prompt profesional.</p>
-        <button class="tool-cta" disabled>Segera Hadir</button>
+    <div class="tools-grid" style="margin-bottom:36px;">
+      <div class="tool-card" onclick="go('tool-image')"><div class="tool-icon-wrap ic-blue">🖼️</div><h3>PROMPT DARI FOTO & GAMBAR</h3><p>Hasilkan prompt dari gambar yang di upload.</p><button class="tool-cta">Mulai Sekarang →</button></div>
+      <div class="tool-card" onclick="go('tool-shorts')"><div class="tool-icon-wrap ic-cyan">▶️</div><h3>PROMPT DARI SHORTS VIDEO</h3><p>Hasilkan prompt dari shorts video yang di upload.</p><button class="tool-cta">Mulai Sekarang →</button></div>
+      <div class="tool-card" onclick="go('tool-long')"><div class="tool-icon-wrap ic-indigo">🎬</div><h3>PROMPT DARI LONG VIDEO</h3><p>Hasilkan prompt dari long video yang di upload.</p><button class="tool-cta">Mulai Sekarang →</button></div>
+      <div class="tool-card disabled"><div class="tool-icon-wrap ic-slate">📚</div><h3>TIPS PROMPTING <span class="cs-badge">SEGERA HADIR</span></h3><p>Panduan lengkap cara menulis prompt profesional.</p><button class="tool-cta" disabled>Segera Hadir</button></div>
+    </div>
+    <div class="history-section">
+      <h3>📋 Riwayat Prompt Terakhir</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Tool</th><th>Bahasa</th><th>Format</th><th>Waktu</th></tr></thead>
+          <tbody id="historyTableBody"><tr><td colspan="4" class="empty-table">Belum ada riwayat.</td></tr></tbody>
+        </table>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════ TOOL IMAGE ═══════════════ -->
+<!-- ══ TOOL IMAGE ══ -->
 <div class="page" id="page-tool-image">
   <div class="tool-page">
-    <div class="tool-header">
-      <h1>PROMPT DARI <span>FOTO & GAMBAR</span></h1>
-      <p>PROMPT KITA · AI POWERED</p>
-    </div>
-    <div class="api-banner" id="apiBannerImg">
+    <div class="tool-header"><h1>PROMPT DARI <span>FOTO & GAMBAR</span></h1><p>PROMPT KITA · AI POWERED BY GEMINI</p></div>
+    <div class="tok-info"><span class="left">💎 Token kamu</span><span class="right" id="tokInfoImg">— token</span></div>
+    <div class="api-banner hidden" id="apiBannerImg">
       <div class="api-banner-icon">⚠️</div>
       <div class="api-banner-body">
         <strong>API Key Gemini diperlukan</strong>
-        <p>Dapatkan gratis di <a href="https://aistudio.google.com" target="_blank" style="color:#fbbf24;">aistudio.google.com</a> — tidak perlu kartu kredit.</p>
-        <div class="api-input-row">
-          <input class="api-input" type="password" id="apiKeyIn" placeholder="AIzaSy..." />
-          <button class="api-save-btn" onclick="saveKey()">SIMPAN</button>
-        </div>
+        <p>Dapatkan gratis di <a href="https://aistudio.google.com" target="_blank" style="color:#fbbf24;">aistudio.google.com</a></p>
+        <div class="api-input-row"><input class="api-input" type="password" id="apiKeyIn" placeholder="AIzaSy..."/><button class="api-save-btn" onclick="saveKey()">SIMPAN</button></div>
       </div>
     </div>
-    <div id="upWrapImg">
-      <div class="upload-zone" id="upZoneImg" ondragover="doDrag(event)" ondrop="doDrop(event,'img')">
-        <input type="file" id="fInImg" accept="image/*" onchange="pickFile(event,'img')" />
-        <div class="upload-icon-box">⬆️</div>
-        <h3>Klik untuk mengunggah gambar</h3>
-        <p>PNG, JPG, WEBP, GIF · Maks. 20MB</p>
-      </div>
-    </div>
-    <div class="preview-box hidden" id="pvImg">
-      <img id="pvImgEl" src="" alt="preview" />
-      <button class="remove-btn" onclick="rmFile('img')">×</button>
-    </div>
+    <div id="upWrapImg"><div class="upload-zone" ondragover="doDrag(event)" ondrop="doDrop(event,'img')"><input type="file" accept="image/*" onchange="pickFile(event,'img')"/><div class="upload-icon-box">⬆️</div><h3>Klik untuk mengunggah gambar</h3><p>PNG, JPG, WEBP, GIF · Maks. 20MB</p></div></div>
+    <div class="preview-box hidden" id="pvImg"><img id="pvImgEl" src="" alt="preview"/><button class="remove-btn" onclick="rmFile('img')">×</button></div>
     <div class="opts-row">
-      <div><label class="opt-label">Bahasa Output</label>
-        <select class="sel" id="langImg"><option value="Indonesia">🌏 Indonesia</option><option value="English">🇬🇧 English</option></select></div>
-      <div><label class="opt-label">Format Output</label>
-        <div class="toggle-row">
-          <button class="tog" id="tTeksImg" onclick="setFmt('img','teks')">📄 Teks</button>
-          <button class="tog on" id="tJsonImg" onclick="setFmt('img','json')">⟨⟩ JSON</button>
-        </div></div>
+      <div><label class="opt-label">Bahasa Output</label><select class="sel" id="langImg"><option value="Indonesia">🌏 Indonesia</option><option value="English">🇬🇧 English</option></select></div>
+      <div><label class="opt-label">Format Output</label><div class="toggle-row"><button class="tog" id="tTeksImg" onclick="setFmt('img','teks')">📄 Teks</button><button class="tog on" id="tJsonImg" onclick="setFmt('img','json')">⟨⟩ JSON</button></div></div>
     </div>
     <button class="gen-btn" id="genBtnImg" onclick="generate('img')">✨ HASILKAN PROMPT</button>
     <div class="result-box hidden" id="resBoxImg">
       <div class="result-head"><span>HASIL PROMPT</span><button class="copy-btn" id="cpBtnImg" onclick="doCopy('img')">📋 Salin</button></div>
-      <div class="result-body" id="resBodyImg">
-        <div class="spin-wrap" id="spinImg"><div class="spin"></div><p>MENGANALISIS GAMBAR...</p></div>
-        <div class="res-text hidden" id="resTextImg"></div>
-      </div>
+      <div class="result-body" id="resBodyImg"><div class="spin-wrap" id="spinImg"><div class="spin"></div><p>MENGANALISIS GAMBAR...</p></div><div class="res-text hidden" id="resTextImg"></div></div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════ TOOL SHORTS ═══════════════ -->
+<!-- ══ TOOL SHORTS ══ -->
 <div class="page" id="page-tool-shorts">
   <div class="tool-page">
-    <div class="tool-header">
-      <h1>PROMPT DARI <span>SHORTS VIDEO</span></h1>
-      <p>PROMPT KITA · AI POWERED</p>
-    </div>
-    <div class="api-banner" id="apiBannerSh">
-      <div class="api-banner-icon">⚠️</div>
-      <div class="api-banner-body">
-        <strong>API Key Gemini diperlukan</strong>
-        <p>Simpan API Key kamu di <a onclick="go('tool-image')" style="color:#fbbf24;cursor:pointer">halaman Foto & Gambar</a> terlebih dahulu.</p>
-      </div>
-    </div>
-    <div id="upWrapSh">
-      <div class="upload-zone" id="upZoneSh" ondragover="doDrag(event)" ondrop="doDrop(event,'sh')">
-        <input type="file" id="fInSh" accept="video/*" onchange="pickFile(event,'sh')" />
-        <div class="upload-icon-box">⬆️</div>
-        <h3>Klik untuk mengunggah video</h3>
-        <p>MP4, MOV, WEBM · Maks. 50MB</p>
-      </div>
-    </div>
-    <div class="preview-box hidden" id="pvSh">
-      <video id="pvShEl" controls></video>
-      <button class="remove-btn" onclick="rmFile('sh')">×</button>
-    </div>
+    <div class="tool-header"><h1>PROMPT DARI <span>SHORTS VIDEO</span></h1><p>PROMPT KITA · AI POWERED BY GEMINI</p></div>
+    <div class="tok-info"><span class="left">💎 Token kamu</span><span class="right" id="tokInfoSh">— token</span></div>
+    <div class="api-banner hidden" id="apiBannerSh"><div class="api-banner-icon">⚠️</div><div class="api-banner-body"><strong>API Key Gemini diperlukan</strong><p>Simpan API Key di <a onclick="go('tool-image')" style="color:#fbbf24;cursor:pointer">halaman Foto & Gambar</a>.</p></div></div>
+    <div id="upWrapSh"><div class="upload-zone" ondragover="doDrag(event)" ondrop="doDrop(event,'sh')"><input type="file" accept="video/*" onchange="pickFile(event,'sh')"/><div class="upload-icon-box">⬆️</div><h3>Klik untuk mengunggah video</h3><p>MP4, MOV, WEBM · Maks. 50MB</p></div></div>
+    <div class="preview-box hidden" id="pvSh"><video id="pvShEl" controls></video><button class="remove-btn" onclick="rmFile('sh')">×</button></div>
     <div class="opts-row">
-      <div><label class="opt-label">Bahasa Output</label>
-        <select class="sel" id="langSh"><option value="Indonesia">🌏 Indonesia</option><option value="English">🇬🇧 English</option></select></div>
-      <div><label class="opt-label">Format Output</label>
-        <div class="toggle-row">
-          <button class="tog on" id="tTeksSh" onclick="setFmt('sh','teks')">📄 Teks</button>
-          <button class="tog" id="tJsonSh" onclick="setFmt('sh','json')">⟨⟩ JSON</button>
-        </div></div>
+      <div><label class="opt-label">Bahasa Output</label><select class="sel" id="langSh"><option value="Indonesia">🌏 Indonesia</option><option value="English">🇬🇧 English</option></select></div>
+      <div><label class="opt-label">Format Output</label><div class="toggle-row"><button class="tog on" id="tTeksSh" onclick="setFmt('sh','teks')">📄 Teks</button><button class="tog" id="tJsonSh" onclick="setFmt('sh','json')">⟨⟩ JSON</button></div></div>
     </div>
     <button class="gen-btn" id="genBtnSh" onclick="generate('sh')">✨ HASILKAN PROMPT</button>
     <div class="result-box hidden" id="resBoxSh">
       <div class="result-head"><span>HASIL PROMPT</span><button class="copy-btn" id="cpBtnSh" onclick="doCopy('sh')">📋 Salin</button></div>
-      <div class="result-body" id="resBodySh">
-        <div class="spin-wrap" id="spinSh"><div class="spin"></div><p>MENGANALISIS VIDEO...</p></div>
-        <div class="res-text hidden" id="resTextSh"></div>
-      </div>
+      <div class="result-body"><div class="spin-wrap" id="spinSh"><div class="spin"></div><p>MENGANALISIS VIDEO...</p></div><div class="res-text hidden" id="resTextSh"></div></div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════ TOOL LONG ═══════════════ -->
+<!-- ══ TOOL LONG ══ -->
 <div class="page" id="page-tool-long">
   <div class="tool-page">
-    <div class="tool-header">
-      <h1>PROMPT DARI <span>LONG VIDEO</span></h1>
-      <p>PROMPT KITA · AI POWERED</p>
-    </div>
-    <div class="api-banner" id="apiBannerLv">
-      <div class="api-banner-icon">⚠️</div>
-      <div class="api-banner-body">
-        <strong>API Key Gemini diperlukan</strong>
-        <p>Simpan API Key kamu di <a onclick="go('tool-image')" style="color:#fbbf24;cursor:pointer">halaman Foto & Gambar</a> terlebih dahulu.</p>
-      </div>
-    </div>
-    <div id="upWrapLv">
-      <div class="upload-zone" ondragover="doDrag(event)" ondrop="doDrop(event,'lv')">
-        <input type="file" id="fInLv" accept="video/*" onchange="pickFile(event,'lv')" />
-        <div class="upload-icon-box">⬆️</div>
-        <h3>Klik untuk mengunggah video</h3>
-        <p>MP4, MOV, WEBM · Maks. 100MB</p>
-      </div>
-    </div>
-    <div class="preview-box hidden" id="pvLv">
-      <video id="pvLvEl" controls></video>
-      <button class="remove-btn" onclick="rmFile('lv')">×</button>
-    </div>
+    <div class="tool-header"><h1>PROMPT DARI <span>LONG VIDEO</span></h1><p>PROMPT KITA · AI POWERED BY GEMINI</p></div>
+    <div class="tok-info"><span class="left">💎 Token kamu</span><span class="right" id="tokInfoLv">— token</span></div>
+    <div class="api-banner hidden" id="apiBannerLv"><div class="api-banner-icon">⚠️</div><div class="api-banner-body"><strong>API Key Gemini diperlukan</strong><p>Simpan API Key di <a onclick="go('tool-image')" style="color:#fbbf24;cursor:pointer">halaman Foto & Gambar</a>.</p></div></div>
+    <div id="upWrapLv"><div class="upload-zone" ondragover="doDrag(event)" ondrop="doDrop(event,'lv')"><input type="file" accept="video/*" onchange="pickFile(event,'lv')"/><div class="upload-icon-box">⬆️</div><h3>Klik untuk mengunggah video</h3><p>MP4, MOV, WEBM · Maks. 100MB</p></div></div>
+    <div class="preview-box hidden" id="pvLv"><video id="pvLvEl" controls></video><button class="remove-btn" onclick="rmFile('lv')">×</button></div>
     <div class="opts-row">
-      <div><label class="opt-label">Bahasa Output</label>
-        <select class="sel" id="langLv"><option value="Indonesia">🌏 Indonesia</option><option value="English">🇬🇧 English</option></select></div>
-      <div><label class="opt-label">Format Output</label>
-        <div class="toggle-row">
-          <button class="tog on" id="tTeksLv" onclick="setFmt('lv','teks')">📄 Teks</button>
-          <button class="tog" id="tJsonLv" onclick="setFmt('lv','json')">⟨⟩ JSON</button>
-        </div></div>
+      <div><label class="opt-label">Bahasa Output</label><select class="sel" id="langLv"><option value="Indonesia">🌏 Indonesia</option><option value="English">🇬🇧 English</option></select></div>
+      <div><label class="opt-label">Format Output</label><div class="toggle-row"><button class="tog on" id="tTeksLv" onclick="setFmt('lv','teks')">📄 Teks</button><button class="tog" id="tJsonLv" onclick="setFmt('lv','json')">⟨⟩ JSON</button></div></div>
     </div>
     <button class="gen-btn" id="genBtnLv" onclick="generate('lv')">✨ HASILKAN PROMPT</button>
     <div class="result-box hidden" id="resBoxLv">
       <div class="result-head"><span>HASIL PROMPT</span><button class="copy-btn" id="cpBtnLv" onclick="doCopy('lv')">📋 Salin</button></div>
-      <div class="result-body" id="resBodyLv">
-        <div class="spin-wrap" id="spinLv"><div class="spin"></div><p>MENGANALISIS VIDEO...</p></div>
-        <div class="res-text hidden" id="resTextLv"></div>
-      </div>
+      <div class="result-body"><div class="spin-wrap" id="spinLv"><div class="spin"></div><p>MENGANALISIS VIDEO...</p></div><div class="res-text hidden" id="resTextLv"></div></div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════ LOGIN ═══════════════ -->
+<!-- ══ LOGIN ══ -->
 <div class="page" id="page-login">
-  <div class="auth-wrap">
-    <div class="auth-box">
-      <button class="back-btn" onclick="go('home')">← Kembali</button>
-      <h2>Masuk</h2>
-      <p class="sub">Masuk ke akun kamu untuk melanjutkan</p>
-      <div class="err-box" id="errLogin"></div>
-      <div class="field"><label>Email</label><input class="finput" type="email" id="lEmail" placeholder="nama@email.com" /></div>
-      <div class="field"><label>Password</label>
-        <div class="fwrap"><input class="finput" type="password" id="lPass" placeholder="••••••••" style="padding-right:42px" /><button class="eye" onclick="togEye('lPass',this)">👁️</button></div>
-      </div>
-      <button class="gen-btn" onclick="doLogin()" style="margin-top:8px;margin-bottom:0">→ MASUK</button>
-      <div class="divline">atau</div>
-      <div class="auth-switch">Belum punya akun? <a onclick="go('register')">Daftar gratis</a></div>
-    </div>
-  </div>
+  <div class="auth-wrap"><div class="auth-box">
+    <button class="back-btn" onclick="go('home')">← Kembali</button>
+    <h2>Masuk</h2><p class="sub">Masuk ke akun kamu untuk melanjutkan</p>
+    <div class="err-box" id="errLogin"></div>
+    <div class="field"><label>Email</label><input class="finput" type="email" id="lEmail" placeholder="nama@email.com"/></div>
+    <div class="field"><label>Password</label><div class="fwrap"><input class="finput" type="password" id="lPass" placeholder="••••••••" style="padding-right:42px"/><button class="eye" onclick="togEye('lPass',this)">👁️</button></div></div>
+    <button class="gen-btn" onclick="doLogin()" style="margin-top:8px;margin-bottom:0">→ MASUK</button>
+    <div class="divline">atau</div>
+    <div class="auth-switch">Belum punya akun? <a onclick="go('register')">Daftar gratis</a></div>
+  </div></div>
 </div>
 
-<!-- ═══════════════ REGISTER ═══════════════ -->
+<!-- ══ REGISTER ══ -->
 <div class="page" id="page-register">
-  <div class="auth-wrap">
-    <div class="auth-box">
-      <button class="back-btn" onclick="go('home')">← Kembali</button>
-      <h2>Daftar</h2>
-      <p class="sub">Buat akun baru dan dapatkan <strong style="color:var(--blue)">5 token gratis</strong> 🎉</p>
-      <div class="err-box" id="errReg"></div>
-      <div class="field"><label>Email</label><input class="finput" type="email" id="rEmail" placeholder="nama@email.com" /></div>
-      <div class="field"><label>Password</label>
-        <div class="fwrap"><input class="finput" type="password" id="rPass" placeholder="Minimal 6 karakter" style="padding-right:42px" /><button class="eye" onclick="togEye('rPass',this)">👁️</button></div>
-      </div>
-      <div class="field"><label>Konfirmasi Password</label>
-        <div class="fwrap"><input class="finput" type="password" id="rPass2" placeholder="Ulangi password" style="padding-right:42px" /><button class="eye" onclick="togEye('rPass2',this)">👁️</button></div>
-      </div>
-      <button class="gen-btn" onclick="doRegister()" style="margin-top:8px;margin-bottom:0">🚀 DAFTAR SEKARANG</button>
-      <div class="divline">atau</div>
-      <div class="auth-switch">Sudah punya akun? <a onclick="go('login')">Masuk</a></div>
-    </div>
-  </div>
+  <div class="auth-wrap"><div class="auth-box">
+    <button class="back-btn" onclick="go('home')">← Kembali</button>
+    <h2>Daftar</h2><p class="sub">Buat akun baru dan dapatkan <strong style="color:var(--blue)">5 token gratis</strong> 🎉</p>
+    <div class="err-box" id="errReg"></div>
+    <div class="success-box" id="okReg"></div>
+    <div class="field"><label>Email</label><input class="finput" type="email" id="rEmail" placeholder="nama@email.com"/></div>
+    <div class="field"><label>Password</label><div class="fwrap"><input class="finput" type="password" id="rPass" placeholder="Minimal 6 karakter" style="padding-right:42px"/><button class="eye" onclick="togEye('rPass',this)">👁️</button></div></div>
+    <div class="field"><label>Konfirmasi Password</label><div class="fwrap"><input class="finput" type="password" id="rPass2" placeholder="Ulangi password" style="padding-right:42px"/><button class="eye" onclick="togEye('rPass2',this)">👁️</button></div></div>
+    <button class="gen-btn" id="regBtn" onclick="doRegister()" style="margin-top:8px;margin-bottom:0">🚀 DAFTAR SEKARANG</button>
+    <div class="divline">atau</div>
+    <div class="auth-switch">Sudah punya akun? <a onclick="go('login')">Masuk</a></div>
+  </div></div>
 </div>
 
-<!-- ═══════════════ PRICING ═══════════════ -->
+<!-- ══ PRICING ══ -->
 <div class="page" id="page-pricing">
   <div class="pricing-pg">
     <div class="pricing-head">
       <div class="sec-eyebrow" style="margin-bottom:10px">✦ HARGA & PAKET</div>
       <h1>Harga <span style="color:var(--blue)">transparan</span>,<br>nilai yang nyata</h1>
-      <p>Mulai gratis. Upgrade kapan saja. Token tidak pernah kadaluarsa.</p>
+      <p>Mulai gratis. Token tidak pernah kadaluarsa. Batalkan kapan saja.</p>
     </div>
-
     <div style="text-align:center;margin-bottom:44px;">
       <div class="tab-switch">
         <button class="tab-btn on" id="tabTok" onclick="switchTab('token')">💎 Beli Token</button>
         <button class="tab-btn" id="tabSub" onclick="switchTab('sub')">🔄 Berlangganan</button>
       </div>
     </div>
-
-    <!-- TOKEN -->
     <div class="tab-content on" id="tcTok">
       <div class="token-grid">
-        <div class="tok-card" id="tc0" onclick="pickPlan('starter')">
-          <div class="tok-name">Starter</div>
-          <div class="tok-price">Rp 15.000</div>
-          <div class="tok-sub">15 token · Rp 1.000/token</div>
-          <hr class="hr-thin">
-          <ul class="tok-feats">
-            <li>15 token siap pakai</li>
-            <li>Akses semua tool</li>
-            <li>Format Teks & JSON</li>
-          </ul>
-          <button class="btn-choose" id="bc0">Pilih Starter</button>
-        </div>
-        <div class="tok-card featured-card" id="tc1" onclick="pickPlan('popular')">
-          <div class="tok-badge">TERLARIS</div>
-          <div class="tok-name">Popular</div>
-          <div class="tok-price">Rp 45.000</div>
-          <div class="tok-sub">50 token · Rp 900/token · hemat 10%</div>
-          <hr class="hr-thin">
-          <ul class="tok-feats">
-            <li>50 token siap pakai</li>
-            <li>Akses semua tool</li>
-            <li>Format Teks & JSON</li>
-            <li>Prioritas antrian AI</li>
-          </ul>
-          <button class="btn-choose feat" id="bc1">Pilih Popular</button>
-        </div>
-        <div class="tok-card" id="tc2" onclick="pickPlan('pro')">
-          <div class="tok-name">Pro</div>
-          <div class="tok-price">
-            <span class="tok-orig">Rp 118.000</span>
-            <span class="disc">16% OFF</span><br>Rp 99.000
-          </div>
-          <div class="tok-sub">100 token · Rp 990/token · hemat 34%</div>
-          <hr class="hr-thin">
-          <ul class="tok-feats">
-            <li>100 token siap pakai</li>
-            <li>Akses semua tool</li>
-            <li>Format Teks & JSON</li>
-            <li>Prioritas antrian AI</li>
-          </ul>
-          <button class="btn-choose" id="bc2">Pilih Pro</button>
-        </div>
-        <div class="tok-card" id="tc3" onclick="pickPlan('mega')">
-          <div class="tok-name">Mega</div>
-          <div class="tok-price">
-            <span class="tok-orig">Rp 235.000</span>
-            <span class="disc">45% OFF</span><br>Rp 129.000
-          </div>
-          <div class="tok-sub">200 token · Rp 645/token · hemat 48%</div>
-          <hr class="hr-thin">
-          <ul class="tok-feats">
-            <li>200 token siap pakai</li>
-            <li>Akses semua tool</li>
-            <li>Format Teks & JSON</li>
-            <li class="star">Prioritas dukungan admin</li>
-            <li class="star">Early access fitur baru</li>
-          </ul>
-          <button class="btn-choose" id="bc3">Pilih Mega</button>
-        </div>
+        <div class="tok-card" id="tc0" onclick="pickPlan('starter')"><div class="tok-name">Starter</div><div class="tok-price">Rp 15.000</div><div class="tok-sub">15 token · Rp 1.000/token</div><hr class="hr-thin"><ul class="tok-feats"><li>15 token siap pakai</li><li>Akses semua tool</li><li>Format Teks & JSON</li></ul><button class="btn-choose">Pilih Starter</button></div>
+        <div class="tok-card" id="tc1" onclick="pickPlan('popular')"><div class="tok-badge">TERLARIS</div><div class="tok-name">Popular</div><div class="tok-price">Rp 45.000</div><div class="tok-sub">50 token · Rp 900/token · hemat 10%</div><hr class="hr-thin"><ul class="tok-feats"><li>50 token siap pakai</li><li>Akses semua tool</li><li>Format Teks & JSON</li><li>Prioritas antrian AI</li></ul><button class="btn-choose feat">Pilih Popular</button></div>
+        <div class="tok-card" id="tc2" onclick="pickPlan('pro')"><div class="tok-name">Pro</div><div class="tok-price"><span class="tok-orig">Rp 118.000</span><span class="disc">16% OFF</span><br>Rp 99.000</div><div class="tok-sub">100 token · hemat 34%</div><hr class="hr-thin"><ul class="tok-feats"><li>100 token siap pakai</li><li>Akses semua tool</li><li>Format Teks & JSON</li><li>Prioritas antrian AI</li></ul><button class="btn-choose">Pilih Pro</button></div>
+        <div class="tok-card" id="tc3" onclick="pickPlan('mega')"><div class="tok-name">Mega</div><div class="tok-price"><span class="tok-orig">Rp 235.000</span><span class="disc">45% OFF</span><br>Rp 129.000</div><div class="tok-sub">200 token · hemat 48%</div><hr class="hr-thin"><ul class="tok-feats"><li>200 token siap pakai</li><li>Akses semua tool</li><li>Format Teks & JSON</li><li class="star">Prioritas support admin</li><li class="star">Early access fitur baru</li></ul><button class="btn-choose">Pilih Mega</button></div>
       </div>
       <p style="text-align:center;color:var(--text3);font-size:12px;margin-bottom:32px;">Semua harga dalam Rupiah. Token tidak ada masa kadaluarsa.</p>
     </div>
-
-    <!-- SUBSCRIPTION -->
     <div class="tab-content" id="tcSub">
       <div class="sub-grid">
-        <div class="sub-card" id="sc0" onclick="pickPlan('basic_sub')">
-          <div class="tok-badge" style="display:none"></div>
-          <div class="sub-plan">Basic</div>
-          <div style="color:var(--text3);font-size:13px;margin-bottom:4px;">Per bulan</div>
-          <div class="sub-price">Rp 29.000<span>/bln</span></div>
-          <p class="sub-desc">Untuk kreator yang baru mulai eksplorasi AI tools.</p>
-          <ul class="sub-feats">
-            <li>30 token / bulan</li>
-            <li>Akses foto & video</li>
-            <li>Format Teks & JSON</li>
-            <li>Support via email</li>
-          </ul>
-          <button class="btn-choose" id="bsc0">Pilih Basic</button>
-        </div>
-        <div class="sub-card featured-card" id="sc1" onclick="pickPlan('growth_sub')">
-          <div class="tok-badge">REKOMENDASI</div>
-          <div class="sub-plan">Growth</div>
-          <div style="color:var(--text3);font-size:13px;margin-bottom:4px;">Per bulan</div>
-          <div class="sub-price">Rp 49.000<span>/bln</span></div>
-          <p class="sub-desc">Untuk kreator aktif yang butuh prompt rutin setiap hari.</p>
-          <ul class="sub-feats">
-            <li>80 token / bulan</li>
-            <li>Akses semua tool</li>
-            <li>Format Teks & JSON</li>
-            <li>Prioritas antrian AI</li>
-            <li>Support via WhatsApp</li>
-          </ul>
-          <button class="btn-choose feat" id="bsc1">Pilih Growth</button>
-        </div>
-        <div class="sub-card" id="sc2" onclick="pickPlan('pro_sub')">
-          <div class="sub-plan">Pro</div>
-          <div style="color:var(--text3);font-size:13px;margin-bottom:4px;">Per bulan</div>
-          <div class="sub-price">Rp 89.000<span>/bln</span></div>
-          <p class="sub-desc">Untuk profesional dan tim yang butuh volume tinggi.</p>
-          <ul class="sub-feats">
-            <li>200 token / bulan</li>
-            <li>Akses semua tool</li>
-            <li>Format Teks & JSON</li>
-            <li>Prioritas antrian AI</li>
-            <li>Dedicated support admin</li>
-            <li>Early access fitur baru</li>
-          </ul>
-          <button class="btn-choose" id="bsc2">Pilih Pro</button>
-        </div>
+        <div class="sub-card" id="sc0" onclick="pickPlan('basic_sub')"><div class="sub-plan">Basic</div><div style="color:var(--text3);font-size:13px;margin-bottom:4px;">Per bulan</div><div class="sub-price">Rp 29.000<span>/bln</span></div><p class="sub-desc">Untuk kreator yang baru mulai eksplorasi AI.</p><ul class="sub-feats"><li>30 token/bulan</li><li>Akses foto & video</li><li>Support via email</li></ul><button class="btn-choose">Pilih Basic</button></div>
+        <div class="sub-card featured-card" id="sc1" onclick="pickPlan('growth_sub')"><div class="tok-badge">REKOMENDASI</div><div class="sub-plan">Growth</div><div style="color:var(--text3);font-size:13px;margin-bottom:4px;">Per bulan</div><div class="sub-price">Rp 49.000<span>/bln</span></div><p class="sub-desc">Untuk kreator aktif yang butuh prompt rutin setiap hari.</p><ul class="sub-feats"><li>80 token/bulan</li><li>Akses semua tool</li><li>Prioritas antrian AI</li><li>Support via WhatsApp</li></ul><button class="btn-choose feat">Pilih Growth</button></div>
+        <div class="sub-card" id="sc2" onclick="pickPlan('pro_sub')"><div class="sub-plan">Pro</div><div style="color:var(--text3);font-size:13px;margin-bottom:4px;">Per bulan</div><div class="sub-price">Rp 89.000<span>/bln</span></div><p class="sub-desc">Untuk profesional yang butuh volume tinggi.</p><ul class="sub-feats"><li>200 token/bulan</li><li>Akses semua tool</li><li>Prioritas antrian AI</li><li>Dedicated admin support</li><li>Early access fitur baru</li></ul><button class="btn-choose">Pilih Pro</button></div>
       </div>
-      <p style="text-align:center;color:var(--text3);font-size:12px;margin-bottom:32px;">Tagihan bulanan. Bisa dibatalkan kapan saja. Token sisa tidak hangus.</p>
+      <p style="text-align:center;color:var(--text3);font-size:12px;margin-bottom:32px;">Tagihan bulanan. Token sisa tidak hangus.</p>
     </div>
-
-    <!-- PAYMENT -->
     <div class="pay-section hidden" id="paySec">
       <div class="pay-head">⚡ Selesaikan Pembayaran</div>
       <div class="pay-body">
-        <div class="pay-method">
-          <div class="pay-icon">⚡</div>
-          <div>
-            <h4>Pembayaran Otomatis — Token/Akses Instan</h4>
-            <p>Via Transfer Bank, E-Wallet (GoPay, OVO, Dana), QRIS, atau Kartu Kredit. Token langsung aktif setelah pembayaran berhasil.</p>
-          </div>
+        <div class="pay-method"><div class="pay-icon">⚡</div><div><h4>Pembayaran Manual — Konfirmasi via WhatsApp</h4><p>Setelah transfer, kirim bukti ke admin. Token akan ditambahkan dalam 5-15 menit.</p></div></div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:14px;">
+          <p style="font-size:13px;color:var(--text2);margin-bottom:8px;">Transfer ke rekening:</p>
+          <p style="font-family:monospace;font-size:14px;color:var(--text);">BCA · 1234567890 · a.n. Prompt Kita</p>
+          <p style="font-family:monospace;font-size:14px;color:var(--text);">GoPay/OVO/Dana · 0822-7757-7294</p>
+          <p style="margin-top:10px;font-size:13px;color:var(--blue);font-weight:600;">Nominal: <span id="payLabel">Rp 0</span></p>
         </div>
-        <button class="btn-pay" onclick="doPay()">⚡ BAYAR SEKARANG — <span id="payLabel">Rp 0</span></button>
-        <button class="btn-wa" onclick="goWA()">💬 Bantuan via WhatsApp Admin</button>
+        <button class="btn-pay" onclick="doPay()">💬 KONFIRMASI PEMBAYARAN VIA WA</button>
+        <button class="btn-wa" onclick="goWA()">💬 Chat Admin WhatsApp</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════ ABOUT ═══════════════ -->
+<!-- ══ ADMIN ══ -->
+<div class="page" id="page-admin">
+  <div class="admin-pg">
+    <div class="admin-header">
+      <h1>🛡️ Admin Dashboard</h1>
+      <button class="btn-sm btn-sm-red" onclick="doLogout()">Logout</button>
+    </div>
+    <div class="admin-stats">
+      <div class="admin-card"><small>Total User</small><div class="val" id="adminTotalUsers">—</div></div>
+      <div class="admin-card"><small>Total Prompt</small><div class="val" id="adminTotalPrompts">—</div></div>
+      <div class="admin-card"><small>Transaksi Pending</small><div class="val" id="adminPending">—</div></div>
+      <div class="admin-card"><small>Transaksi Selesai</small><div class="val" id="adminDone">—</div></div>
+    </div>
+
+    <!-- KELOLA USER -->
+    <div class="admin-section">
+      <div class="admin-section-head">
+        <h3>👥 Kelola User</h3>
+        <input class="search-input" id="searchUser" placeholder="Cari email..." oninput="filterUsers()" />
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Email</th><th>Token</th><th>Total Prompt</th><th>Bergabung</th><th>Tambah Token</th></tr></thead>
+          <tbody id="adminUsersBody"><tr><td colspan="5" class="empty-table">Memuat data user...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TRANSAKSI -->
+    <div class="admin-section">
+      <div class="admin-section-head">
+        <h3>💳 Riwayat Transaksi</h3>
+        <button class="btn-sm btn-sm-blue" onclick="loadAdminData()">🔄 Refresh</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Email</th><th>Paket</th><th>Nominal</th><th>Token</th><th>Status</th><th>Waktu</th></tr></thead>
+          <tbody id="adminTxBody"><tr><td colspan="6" class="empty-table">Memuat transaksi...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ABOUT ══ -->
 <div class="page" id="page-about">
   <div class="about-pg">
     <div class="about-hero">
       <div class="sec-eyebrow" style="margin-bottom:14px">TENTANG KAMI</div>
       <h1>Membangun jembatan<br>antara <span>visual</span> dan <span>AI</span></h1>
-      <p><strong>PROMPT KITA</strong> adalah platform AI yang membantu kreator, desainer, dan pengguna Indonesia untuk mengubah gambar maupun video menjadi prompt AI yang siap pakai. Kami percaya setiap visual memiliki cerita — tugas kami menerjemahkannya ke instruksi yang dimengerti AI generatif.</p>
-      <p>Dibangun dengan semangat gotong royong digital. Untuk kreator Indonesia, oleh orang Indonesia.</p>
+      <p><strong>PROMPT KITA</strong> adalah platform AI yang membantu kreator, desainer, dan pengguna Indonesia mengubah gambar maupun video menjadi prompt AI yang siap pakai.</p>
+      <p>Dibangun dengan semangat gotong royong digital. Untuk kreator Indonesia, oleh orang Indonesia. 🇮🇩</p>
     </div>
     <div class="about-grid">
       <div class="about-card"><div class="about-card-ic">🎯</div><h4>Misi</h4><p>Membuat AI generatif mudah diakses oleh semua kreator Indonesia, tanpa barrier teknis.</p></div>
@@ -1182,317 +696,420 @@ footer{border-top:1px solid var(--border);padding:48px 32px 32px;margin-top:80px
       <div class="contact-head">📬 Hubungi Kami</div>
       <div class="contact-row"><div class="contact-ic">✉️</div><div><small>Email</small><strong>promptkita@gmail.com</strong></div></div>
       <div class="contact-row"><div class="contact-ic">💬</div><div><small>WhatsApp</small><strong>+62 822-7757-7294</strong></div></div>
-      <div class="contact-row"><div class="contact-ic">📍</div><div><small>Alamat</small><strong>Indonesia 🇮🇩</strong></div></div>
+      <div class="contact-row"><div class="contact-ic">📍</div><div><small>Lokasi</small><strong>Indonesia 🇮🇩</strong></div></div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════ PRIVACY ═══════════════ -->
-<div class="page" id="page-privacy">
-  <div class="legal-pg">
-    <h1>Kebijakan Privasi</h1>
-    <span class="legal-date">TERAKHIR DIPERBARUI: MEI 2026</span>
-    <div class="legal-sec"><h2>1. Pendahuluan</h2><p>PROMPT KITA menghormati privasi Anda. Kebijakan ini menjelaskan bagaimana kami mengumpulkan, menggunakan, dan melindungi informasi pribadi Anda.</p></div>
-    <div class="legal-sec"><h2>2. Informasi yang Kami Kumpulkan</h2><ul><li>Alamat email dan kata sandi (terenkripsi) saat mendaftar.</li><li>Riwayat transaksi token dan metode pembayaran.</li><li>File gambar/video yang diunggah untuk diproses AI.</li><li>Data teknis seperti alamat IP dan jenis perangkat.</li></ul></div>
-    <div class="legal-sec"><h2>3. Penggunaan Informasi</h2><ul><li>Menyediakan dan meningkatkan kualitas layanan.</li><li>Memproses pembayaran dan mengelola saldo token.</li><li>Mengirim notifikasi penting terkait akun Anda.</li></ul></div>
-    <div class="legal-sec"><h2>4. File yang Diunggah</h2><p>File gambar atau video hanya digunakan untuk menghasilkan prompt AI dan tidak disimpan secara permanen. File dihapus otomatis setelah pemrosesan selesai.</p></div>
-    <div class="legal-sec"><h2>5. Keamanan Data</h2><p>Kami menggunakan enkripsi standar industri. Namun Anda juga bertanggung jawab menjaga kerahasiaan akun Anda.</p></div>
-    <div class="legal-sec"><h2>6. Kontak</h2><p>Pertanyaan terkait privasi: <strong>promptkita@gmail.com</strong></p></div>
-  </div>
-</div>
+<!-- ══ PRIVACY & TERMS ══ -->
+<div class="page" id="page-privacy"><div class="legal-pg"><h1>Kebijakan Privasi</h1><span class="legal-date">TERAKHIR DIPERBARUI: MEI 2026</span><div class="legal-sec"><h2>1. Pendahuluan</h2><p>PROMPT KITA menghormati privasi Anda dan berkomitmen melindungi data pribadi Anda.</p></div><div class="legal-sec"><h2>2. Data yang Dikumpulkan</h2><ul><li>Email dan password (terenkripsi) saat mendaftar</li><li>Riwayat penggunaan dan transaksi token</li><li>File yang diunggah (hanya untuk diproses, tidak disimpan permanen)</li></ul></div><div class="legal-sec"><h2>3. Penggunaan Data</h2><p>Data digunakan untuk menyediakan layanan, memproses pembayaran, dan meningkatkan kualitas platform.</p></div><div class="legal-sec"><h2>4. Keamanan</h2><p>Data disimpan di Supabase dengan enkripsi standar industri. File yang diunggah dihapus otomatis setelah diproses.</p></div><div class="legal-sec"><h2>5. Kontak</h2><p>Pertanyaan: <strong>promptkita@gmail.com</strong></p></div></div></div>
+<div class="page" id="page-terms"><div class="legal-pg"><h1>Syarat & Ketentuan</h1><span class="legal-date">TERAKHIR DIPERBARUI: MEI 2026</span><div class="legal-sec"><h2>1. Penerimaan</h2><p>Dengan menggunakan PROMPT KITA, Anda menyetujui syarat dan ketentuan ini.</p></div><div class="legal-sec"><h2>2. Layanan</h2><p>PROMPT KITA menyediakan layanan pembuatan prompt AI dari gambar dan video menggunakan Google Gemini.</p></div><div class="legal-sec"><h2>3. Token & Pembayaran</h2><p>Token tidak dapat dikembalikan dan tidak memiliki masa kadaluarsa. Berlangganan dapat dibatalkan kapan saja.</p></div><div class="legal-sec"><h2>4. Larangan</h2><p>Dilarang menggunakan untuk konten ilegal, melanggar hak cipta, atau melanggar hukum Indonesia.</p></div><div class="legal-sec"><h2>5. Kontak</h2><p><strong>promptkita@gmail.com</strong></p></div></div></div>
 
-<!-- ═══════════════ TERMS ═══════════════ -->
-<div class="page" id="page-terms">
-  <div class="legal-pg">
-    <h1>Syarat & Ketentuan</h1>
-    <span class="legal-date">TERAKHIR DIPERBARUI: MEI 2026</span>
-    <div class="legal-sec"><h2>1. Penerimaan Ketentuan</h2><p>Dengan menggunakan PROMPT KITA, Anda menyetujui syarat dan ketentuan yang berlaku.</p></div>
-    <div class="legal-sec"><h2>2. Layanan</h2><p>PROMPT KITA menyediakan layanan pembuatan prompt AI dari gambar maupun video menggunakan teknologi Google Gemini.</p></div>
-    <div class="legal-sec"><h2>3. Token & Pembayaran</h2><p>Token yang sudah dibeli tidak dapat dikembalikan (non-refundable) dan tidak memiliki masa kadaluarsa. Berlangganan dapat dibatalkan kapan saja.</p></div>
-    <div class="legal-sec"><h2>4. Penggunaan yang Dilarang</h2><p>Dilarang menggunakan layanan untuk konten ilegal, melanggar hak cipta, pornografi, kekerasan, atau hal lain yang melanggar hukum di Indonesia.</p></div>
-    <div class="legal-sec"><h2>5. Batasan Tanggung Jawab</h2><p>Layanan disediakan "sebagaimana adanya". Kami tidak bertanggung jawab atas kerugian dari penggunaan layanan ini.</p></div>
-  </div>
-</div>
-
-<!-- ═══════════════ FOOTER ═══════════════ -->
+<!-- FOOTER -->
 <footer>
   <div class="foot-inner">
-    <div class="foot-brand">
-      <div class="logo"><div class="logo-icon" style="width:28px;height:28px;font-size:13px">PK</div><span>PROMPT</span> KITA</div>
-      <p>Prompt AI terbaik untuk kreator Indonesia. Dari visual ke prompt, dalam hitungan detik.</p>
-    </div>
-    <div class="foot-col">
-      <h4>Produk</h4>
-      <a onclick="go('tool-image')">Prompt dari Foto</a>
-      <a onclick="go('tool-shorts')">Prompt dari Shorts</a>
-      <a onclick="go('tool-long')">Prompt dari Long Video</a>
-    </div>
-    <div class="foot-col">
-      <h4>Perusahaan</h4>
-      <a onclick="go('about')">Tentang Kami</a>
-      <a onclick="go('pricing')">Harga</a>
-      <a onclick="go('privacy')">Kebijakan Privasi</a>
-      <a onclick="go('terms')">Syarat & Ketentuan</a>
-    </div>
-    <div class="foot-col">
-      <h4>Kontak</h4>
-      <a>promptkita@gmail.com</a>
-      <a onclick="goWA()">WhatsApp Admin</a>
-    </div>
+    <div class="foot-brand"><div class="logo"><div class="logo-icon" style="width:28px;height:28px;font-size:13px">PK</div><span>PROMPT</span> KITA</div><p>Prompt AI terbaik untuk kreator Indonesia. Dari visual ke prompt, dalam hitungan detik.</p></div>
+    <div class="foot-col"><h4>Produk</h4><a onclick="go('tool-image')">Prompt dari Foto</a><a onclick="go('tool-shorts')">Prompt dari Shorts</a><a onclick="go('tool-long')">Prompt dari Long Video</a></div>
+    <div class="foot-col"><h4>Perusahaan</h4><a onclick="go('about')">Tentang Kami</a><a onclick="go('pricing')">Harga</a><a onclick="go('privacy')">Kebijakan Privasi</a><a onclick="go('terms')">Syarat & Ketentuan</a></div>
+    <div class="foot-col"><h4>Kontak</h4><a>promptkita@gmail.com</a><a onclick="goWA()">WhatsApp Admin</a></div>
   </div>
-  <div class="foot-bottom">
-    <p>© 2026 Prompt Kita. Semua hak dilindungi.</p>
-    <p>Dibuat dengan ❤️ untuk kreator Indonesia 🇮🇩</p>
-  </div>
+  <div class="foot-bottom"><p>© 2026 Prompt Kita. Semua hak dilindungi.</p><p>Dibuat dengan ❤️ untuk kreator Indonesia 🇮🇩</p></div>
 </footer>
 
 <script>
-// ══════ STATE ══════
-let user=null, tokens=0, prompts=0;
-let apiKey=localStorage.getItem('pk_apikey')||'';
-let selPlan=null, selPlanPrice=0;
-let fmt={img:'json',sh:'teks',lv:'teks'};
-let files={img:null,sh:null,lv:null};
-let results={img:'',sh:'',lv:''};
+// ══════════════════════════════════════════
+// SUPABASE INIT
+// ══════════════════════════════════════════
+const SUPABASE_URL = 'https://qlgyjjqlzfdpuliojkdz.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFsZ3lqanFsemZkcHVsaW9qa2R6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MjM5NjgsImV4cCI6MjA5NDI5OTk2OH0.2Da6aCBpG325d9IKicBAGlIYP3eQC0ikFe1EU3ljVl0';
+const ADMIN_EMAIL  = 'asepmaulana89@gmail.com'; // GANTI dengan email kamu
+const ADMIN_PASS   = 'PromptKita@Admin2026'; // GANTI dengan password kamu
 
-// ══════ NAV ══════
-function go(page){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  const el=document.getElementById('page-'+page);
-  if(el){el.classList.add('active');window.scrollTo(0,0);}
-  // refresh api banners
-  if(page==='tool-image') refreshBanner('apiBannerImg');
-  if(page==='tool-shorts') refreshBanner('apiBannerSh');
-  if(page==='tool-long') refreshBanner('apiBannerLv');
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+let currentUser = null;
+let userProfile = null;
+let apiKey = localStorage.getItem('pk_apikey') || '';
+let fmt = {img:'json', sh:'teks', lv:'teks'};
+let files = {img:null, sh:null, lv:null};
+let results = {img:'', sh:'', lv:''};
+let selPlan = null;
+let allUsers = [];
+
+const plans = {
+  starter:   {price:15000,  tokens:15,  label:'Starter — Rp 15.000 (15 Token)'},
+  popular:   {price:45000,  tokens:50,  label:'Popular — Rp 45.000 (50 Token)'},
+  pro:       {price:99000,  tokens:100, label:'Pro — Rp 99.000 (100 Token)'},
+  mega:      {price:129000, tokens:200, label:'Mega — Rp 129.000 (200 Token)'},
+  basic_sub: {price:29000,  tokens:30,  label:'Basic Langganan — Rp 29.000/bln'},
+  growth_sub:{price:49000,  tokens:80,  label:'Growth Langganan — Rp 49.000/bln'},
+  pro_sub:   {price:89000,  tokens:200, label:'Pro Langganan — Rp 89.000/bln'}
+};
+
+// ══════════════════════════════════════════
+// INIT — cek session
+// ══════════════════════════════════════════
+async function init() {
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      currentUser = session.user;
+      await loadProfile();
+    }
+    await loadPublicStats();
+  } catch(e) {
+    console.error('Init error:', e);
+  } finally {
+    document.getElementById('loadingOverlay').style.display = 'none';
+  }
+  refreshNav();
+  refreshApiWarnings();
+
+  // listen auth changes
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      currentUser = session.user;
+      await loadProfile();
+      refreshNav();
+    } else if (event === 'SIGNED_OUT') {
+      currentUser = null; userProfile = null;
+      refreshNav();
+      go('home');
+    }
+  });
 }
-function refreshBanner(id){
-  const el=document.getElementById(id);
-  if(el) el.style.display=apiKey?'none':'flex';
-}
-function refreshNav(){
-  const nr=document.getElementById('navRight');
-  if(user){
-    nr.innerHTML=`<div class="token-chip" onclick="openM('modalToken')">💎 ${tokens} Token</div>
-    <div class="avatar" onclick="doLogout()" title="Logout">${user.email.substring(0,2).toUpperCase()}</div>`;
-    document.getElementById('dTok').textContent=tokens;
-    document.getElementById('dPro').textContent=prompts;
-    document.getElementById('dStat').textContent='Aktif';
-    document.getElementById('dashHi').textContent='Halo, '+user.email.split('@')[0]+' 👋';
-  } else {
-    nr.innerHTML=`<button class="btn-nav-ghost" onclick="go('login')">Masuk</button>
-    <button class="btn-nav-blue" onclick="go('register')">🚀 Mulai Gratis</button>`;
-    document.getElementById('dTok').textContent=0;
-    document.getElementById('dPro').textContent=0;
-    document.getElementById('dStat').textContent='Tamu';
+
+// ══════════════════════════════════════════
+// PROFILE
+// ══════════════════════════════════════════
+async function loadProfile() {
+  if (!currentUser) return;
+  const { data, error } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
+  if (!error && data) {
+    userProfile = data;
+    updateDashboard();
+    updateTokenInfoBars();
   }
 }
 
-// ══════ API KEY ══════
-function saveKey(){
-  const v=document.getElementById('apiKeyIn').value.trim();
-  if(!v.startsWith('AIza')){toast('⚠ API Key tidak valid. Harus diawali AIza...');return;}
-  apiKey=v; localStorage.setItem('pk_apikey',v);
-  document.getElementById('apiBannerImg').style.display='none';
-  toast('✅ API Key berhasil disimpan!');
+function updateDashboard() {
+  if (!userProfile) return;
+  document.getElementById('dashHi').textContent = 'Halo, ' + (userProfile.email.split('@')[0]) + ' 👋';
+  document.getElementById('dTok').textContent = userProfile.tokens;
+  document.getElementById('dPro').textContent = userProfile.total_prompts;
+  document.getElementById('dPlan').textContent = userProfile.plan || 'free';
+  document.getElementById('dJoin').textContent = new Date(userProfile.created_at).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});
+  loadHistory();
 }
 
-// ══════ AUTH ══════
-function doLogin(){
-  const em=document.getElementById('lEmail').value.trim();
-  const pw=document.getElementById('lPass').value;
-  const err=document.getElementById('errLogin');
-  if(!em||!pw){showErr(err,'Email dan password wajib diisi.');return;}
-  const db=JSON.parse(localStorage.getItem('pk_users')||'{}');
-  if(!db[em]){showErr(err,'Akun tidak ditemukan. Silakan daftar.');return;}
-  if(db[em].pw!==btoa(pw)){showErr(err,'Password salah.');return;}
-  user={email:em}; tokens=db[em].tokens||0; prompts=db[em].prompts||0;
-  refreshNav(); toast('✅ Selamat datang kembali, '+em.split('@')[0]+'!');
-  go('dashboard');
+function updateTokenInfoBars() {
+  const tok = userProfile ? userProfile.tokens : '—';
+  document.getElementById('tokInfoImg').textContent = tok + ' token';
+  document.getElementById('tokInfoSh').textContent = tok + ' token';
+  document.getElementById('tokInfoLv').textContent = tok + ' token';
 }
-function doRegister(){
-  const em=document.getElementById('rEmail').value.trim();
-  const pw=document.getElementById('rPass').value;
-  const pw2=document.getElementById('rPass2').value;
-  const err=document.getElementById('errReg');
-  if(!em||!pw||!pw2){showErr(err,'Semua field wajib diisi.');return;}
-  if(!em.includes('@')){showErr(err,'Format email tidak valid.');return;}
-  if(pw.length<6){showErr(err,'Password minimal 6 karakter.');return;}
-  if(pw!==pw2){showErr(err,'Password tidak cocok.');return;}
-  const db=JSON.parse(localStorage.getItem('pk_users')||'{}');
-  if(db[em]){showErr(err,'Email sudah terdaftar.');return;}
-  db[em]={pw:btoa(pw),tokens:5,prompts:0};
-  localStorage.setItem('pk_users',JSON.stringify(db));
-  user={email:em}; tokens=5; prompts=0;
-  refreshNav(); toast('🎉 Akun berhasil dibuat! Kamu dapat 5 token gratis!');
-  go('dashboard');
+
+async function loadHistory() {
+  if (!currentUser) return;
+  const { data } = await sb.from('prompt_history').select('*').eq('user_id', currentUser.id).order('created_at',{ascending:false}).limit(10);
+  const tbody = document.getElementById('historyTableBody');
+  if (!data || data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" class="empty-table">Belum ada riwayat prompt.</td></tr>';
+    return;
+  }
+  const typeMap = {img:'🖼️ Foto',sh:'▶️ Shorts',lv:'🎬 Long Video'};
+  const badgeMap = {img:'badge-img',sh:'badge-sh',lv:'badge-lv'};
+  tbody.innerHTML = data.map(h => `
+    <tr class="user-row">
+      <td><span class="badge-type ${badgeMap[h.tool_type]||'badge-img'}">${typeMap[h.tool_type]||h.tool_type}</span></td>
+      <td>${h.language}</td>
+      <td>${h.output_format}</td>
+      <td>${new Date(h.created_at).toLocaleDateString('id-ID',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</td>
+    </tr>`).join('');
 }
-function doLogout(){
-  if(!confirm('Yakin ingin keluar?'))return;
-  user=null; tokens=0; prompts=0;
+
+async function loadPublicStats() {
+  try {
+    const { count: userCount } = await sb.from('profiles').select('*',{count:'exact',head:true});
+    const { count: promptCount } = await sb.from('prompt_history').select('*',{count:'exact',head:true});
+    if (userCount !== null) document.getElementById('statUsers').textContent = userCount + '+';
+    if (promptCount !== null) document.getElementById('statPrompts').textContent = promptCount + '+';
+  } catch(e) {}
+}
+
+// ══════════════════════════════════════════
+// NAV
+// ══════════════════════════════════════════
+function refreshNav() {
+  const nr = document.getElementById('navRight');
+  const isAdmin = currentUser?.email === ADMIN_EMAIL;
+  if (currentUser && userProfile) {
+    const init2 = userProfile.email.substring(0,2).toUpperCase();
+    nr.innerHTML = `
+      <div class="token-chip" onclick="go('pricing')">💎 ${userProfile.tokens} Token</div>
+      <div class="avatar" id="avatarBtn" onclick="toggleAvatarMenu()">
+        ${init2}
+        <div class="avatar-menu" id="avatarMenu">
+          <button class="avatar-menu-item" onclick="go('dashboard')">📊 Dashboard</button>
+          ${isAdmin ? '<button class="avatar-menu-item" onclick="go(\'admin\');loadAdminData()">🛡️ Admin Panel</button>' : ''}
+          <button class="avatar-menu-item" onclick="go('pricing')">💎 Beli Token</button>
+          <button class="avatar-menu-item red" onclick="doLogout()">→ Keluar</button>
+        </div>
+      </div>`;
+  } else {
+    nr.innerHTML = `
+      <button class="btn-ghost" onclick="go('login')">Masuk</button>
+      <button class="btn-blue" onclick="go('register')">🚀 Mulai Gratis</button>`;
+  }
+}
+
+function toggleAvatarMenu() {
+  const m = document.getElementById('avatarMenu');
+  if (m) m.classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  const btn = document.getElementById('avatarBtn');
+  if (btn && !btn.contains(e.target)) {
+    const m = document.getElementById('avatarMenu');
+    if (m) m.classList.remove('open');
+  }
+});
+
+// ══════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════
+async function doLogin() {
+  const em = document.getElementById('lEmail').value.trim();
+  const pw = document.getElementById('lPass').value;
+  const err = document.getElementById('errLogin');
+  if (!em || !pw) { showErr(err,'Email dan password wajib diisi.'); return; }
+
+  const btn = document.querySelector('#page-login .gen-btn');
+  btn.disabled = true; btn.textContent = '⟳ Memproses...';
+
+  const { data, error } = await sb.auth.signInWithPassword({ email: em, password: pw });
+  if (error) {
+    showErr(err, error.message.includes('Invalid') ? 'Email atau password salah.' : error.message);
+    btn.disabled = false; btn.textContent = '→ MASUK';
+    return;
+  }
+  currentUser = data.user;
+  await loadProfile();
+  refreshNav();
+  toast('✅ Selamat datang kembali!');
+  // cek admin
+  if (currentUser.email === ADMIN_EMAIL) { go('admin'); loadAdminData(); }
+  else go('dashboard');
+  btn.disabled = false; btn.textContent = '→ MASUK';
+}
+
+async function doRegister() {
+  const em = document.getElementById('rEmail').value.trim();
+  const pw = document.getElementById('rPass').value;
+  const pw2 = document.getElementById('rPass2').value;
+  const err = document.getElementById('errReg');
+  const ok = document.getElementById('okReg');
+  if (!em || !pw || !pw2) { showErr(err,'Semua field wajib diisi.'); return; }
+  if (!em.includes('@')) { showErr(err,'Format email tidak valid.'); return; }
+  if (pw.length < 6) { showErr(err,'Password minimal 6 karakter.'); return; }
+  if (pw !== pw2) { showErr(err,'Password tidak cocok.'); return; }
+
+  const btn = document.getElementById('regBtn');
+  btn.disabled = true; btn.textContent = '⟳ Mendaftarkan...';
+
+  const { data, error } = await sb.auth.signUp({ email: em, password: pw });
+  if (error) {
+    showErr(err, error.message.includes('already') ? 'Email sudah terdaftar. Silakan masuk.' : error.message);
+    btn.disabled = false; btn.textContent = '🚀 DAFTAR SEKARANG';
+    return;
+  }
+
+  // Cek apakah email confirmation diperlukan
+  if (data.user && !data.session) {
+    ok.textContent = '✅ Cek email kamu untuk verifikasi, lalu login!';
+    ok.style.display = 'block';
+    btn.disabled = false; btn.textContent = '🚀 DAFTAR SEKARANG';
+    return;
+  }
+
+  currentUser = data.user;
+  await new Promise(r => setTimeout(r, 1000)); // tunggu trigger
+  await loadProfile();
+  refreshNav();
+  toast('🎉 Akun berhasil dibuat! Kamu dapat 5 token gratis!');
+  go('dashboard');
+  btn.disabled = false; btn.textContent = '🚀 DAFTAR SEKARANG';
+}
+
+async function doLogout() {
+  await sb.auth.signOut();
+  currentUser = null; userProfile = null;
   refreshNav(); toast('✅ Berhasil keluar.'); go('home');
 }
-function showErr(el,msg){el.textContent=msg;el.style.display='block';setTimeout(()=>el.style.display='none',4000);}
-function togEye(id,btn){
-  const i=document.getElementById(id);
-  i.type=i.type==='password'?'text':'password';
-  btn.textContent=i.type==='password'?'👁️':'🙈';
+
+// ══════════════════════════════════════════
+// API KEY
+// ══════════════════════════════════════════
+function saveKey() {
+  const v = document.getElementById('apiKeyIn').value.trim();
+  if (!v.startsWith('AIza')) { toast('⚠ API Key tidak valid.'); return; }
+  apiKey = v; localStorage.setItem('pk_apikey', v);
+  document.getElementById('apiBannerImg').classList.add('hidden');
+  toast('✅ API Key berhasil disimpan!');
+}
+function refreshApiWarnings() {
+  ['apiBannerImg','apiBannerSh','apiBannerLv'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('hidden', !!apiKey);
+  });
 }
 
-// ══════ FILE HANDLING ══════
+// ══════════════════════════════════════════
+// FILE HANDLING
+// ══════════════════════════════════════════
 function doDrag(e){e.preventDefault();}
-function doDrop(e,t){
-  e.preventDefault();
-  const f=e.dataTransfer.files[0];
-  if(f) loadFile(f,t);
-}
+function doDrop(e,t){e.preventDefault();const f=e.dataTransfer.files[0];if(f)loadFile(f,t);}
 function pickFile(e,t){const f=e.target.files[0];if(f)loadFile(f,t);}
 function loadFile(f,t){
-  const isImg=t==='img', isVid=t==='sh'||t==='lv';
   const maxMB={img:20,sh:50,lv:100}[t];
+  const isImg=t==='img';
   if(isImg&&!f.type.startsWith('image/')){toast('⚠ File harus berupa gambar.');return;}
-  if(isVid&&!f.type.startsWith('video/')){toast('⚠ File harus berupa video.');return;}
+  if(!isImg&&!f.type.startsWith('video/')){toast('⚠ File harus berupa video.');return;}
   if(f.size>maxMB*1024*1024){toast(`⚠ Ukuran file maksimal ${maxMB}MB.`);return;}
   files[t]=f;
   const url=URL.createObjectURL(f);
-  if(t==='img'){
-    document.getElementById('pvImgEl').src=url;
-    document.getElementById('upWrapImg').classList.add('hidden');
-    document.getElementById('pvImg').classList.remove('hidden');
-  } else if(t==='sh'){
-    document.getElementById('pvShEl').src=url;
-    document.getElementById('upWrapSh').classList.add('hidden');
-    document.getElementById('pvSh').classList.remove('hidden');
-  } else {
-    document.getElementById('pvLvEl').src=url;
-    document.getElementById('upWrapLv').classList.add('hidden');
-    document.getElementById('pvLv').classList.remove('hidden');
-  }
+  if(t==='img'){document.getElementById('pvImgEl').src=url;document.getElementById('upWrapImg').classList.add('hidden');document.getElementById('pvImg').classList.remove('hidden');}
+  else if(t==='sh'){document.getElementById('pvShEl').src=url;document.getElementById('upWrapSh').classList.add('hidden');document.getElementById('pvSh').classList.remove('hidden');}
+  else{document.getElementById('pvLvEl').src=url;document.getElementById('upWrapLv').classList.add('hidden');document.getElementById('pvLv').classList.remove('hidden');}
 }
 function rmFile(t){
   files[t]=null;
-  const maps={
-    img:['pvImg','upWrapImg','fInImg','resBoxImg','pvImgEl'],
-    sh:['pvSh','upWrapSh','fInSh','resBoxSh','pvShEl'],
-    lv:['pvLv','upWrapLv','fInLv','resBoxLv','pvLvEl']
-  };
-  const [pv,uw,fi,rb,el]=maps[t];
+  const m={img:['pvImg','upWrapImg','pvImgEl','resBoxImg'],sh:['pvSh','upWrapSh','pvShEl','resBoxSh'],lv:['pvLv','upWrapLv','pvLvEl','resBoxLv']};
+  const [pv,uw,el,rb]=m[t];
   document.getElementById(pv).classList.add('hidden');
   document.getElementById(uw).classList.remove('hidden');
-  document.getElementById(fi).value='';
   document.getElementById(rb).classList.add('hidden');
-  if(t==='img') document.getElementById(el).src='';
-  else document.getElementById(el).src='';
+  const elDOM=document.getElementById(el);
+  if(elDOM) elDOM.src='';
 }
 
-// ══════ FORMAT ══════
+// ══════════════════════════════════════════
+// FORMAT
+// ══════════════════════════════════════════
 function setFmt(t,f){
   fmt[t]=f;
-  const map={
-    img:['tTeksImg','tJsonImg'],
-    sh:['tTeksSh','tJsonSh'],
-    lv:['tTeksLv','tJsonLv']
-  };
+  const map={img:['tTeksImg','tJsonImg'],sh:['tTeksSh','tJsonSh'],lv:['tTeksLv','tJsonLv']};
   const [tk,tj]=map[t];
   document.getElementById(tk).classList.toggle('on',f==='teks');
   document.getElementById(tj).classList.toggle('on',f==='json');
 }
 
-// ══════ GENERATE ══════
-async function generate(t){
-  if(!apiKey){toast('⚠ Masukkan API Key Gemini terlebih dahulu!');go('tool-image');return;}
-  if(!files[t]){toast('⚠ Upload file terlebih dahulu!');return;}
-  const cfg={
+// ══════════════════════════════════════════
+// GENERATE PROMPT
+// ══════════════════════════════════════════
+async function generate(t) {
+  if (!apiKey) { toast('⚠ Masukkan API Key Gemini!'); go('tool-image'); return; }
+  if (!files[t]) { toast('⚠ Upload file terlebih dahulu!'); return; }
+
+  // cek token jika login
+  if (currentUser && userProfile && userProfile.tokens <= 0) {
+    toast('⚠ Token habis! Beli token untuk melanjutkan.');
+    go('pricing'); return;
+  }
+
+  const cfg = {
     img:{lang:'langImg',btn:'genBtnImg',box:'resBoxImg',spin:'spinImg',txt:'resTextImg',type:'gambar'},
     sh:{lang:'langSh',btn:'genBtnSh',box:'resBoxSh',spin:'spinSh',txt:'resTextSh',type:'video pendek'},
     lv:{lang:'langLv',btn:'genBtnLv',box:'resBoxLv',spin:'spinLv',txt:'resTextLv',type:'video panjang'}
   }[t];
+
   const btn=document.getElementById(cfg.btn);
   const box=document.getElementById(cfg.box);
   const spin=document.getElementById(cfg.spin);
   const txtEl=document.getElementById(cfg.txt);
   const lang=document.getElementById(cfg.lang).value;
   const f=fmt[t];
+
   btn.disabled=true; btn.textContent='⟳ Memproses...';
   box.classList.remove('hidden');
   spin.classList.remove('hidden');
   txtEl.classList.add('hidden'); txtEl.textContent='';
-  try{
+
+  try {
     const b64=await toB64(files[t]);
     const mime=files[t].type;
     const langStr=lang==='Indonesia'?'Berikan seluruh output dalam Bahasa Indonesia.':'Provide all output in English.';
     const fmtStr=f==='json'
-      ?`Kembalikan HANYA objek JSON valid dengan key: {"subject":"...","style":"...","lighting":"...","composition":"...","mood":"...","color_palette":"...","technical_details":"...","full_prompt":"..."}. Tanpa markdown, tanpa penjelasan di luar JSON.`
+      ?`Kembalikan HANYA objek JSON valid dengan key: {"subject":"...","style":"...","lighting":"...","composition":"...","mood":"...","color_palette":"...","technical_details":"...","full_prompt":"..."}. Tanpa markdown, tanpa teks di luar JSON.`
       :`Berikan prompt dalam format teks dengan bagian: Subjek, Gaya/Style, Pencahayaan, Komposisi, Suasana/Mood, Palet Warna, Detail Teknis, dan Prompt Lengkap Siap Pakai.`;
+
     const prompt=`Analisis ${cfg.type} ini dan hasilkan prompt AI yang detail untuk image generation. ${langStr} ${fmtStr}`;
+
     const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        contents:[{parts:[{text:prompt},{inline_data:{mime_type:mime,data:b64}}]}],
-        generationConfig:{temperature:.7,maxOutputTokens:2048}
-      })
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{parts:[{text:prompt},{inline_data:{mime_type:mime,data:b64}}]}],generationConfig:{temperature:.7,maxOutputTokens:2048}})
     });
     const data=await res.json();
     if(data.error) throw new Error(data.error.message);
     const raw=data.candidates?.[0]?.content?.parts?.[0]?.text||'';
+
     spin.classList.add('hidden'); txtEl.classList.remove('hidden');
     if(f==='json'){
       let clean=raw.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
-      try{
-        const p=JSON.parse(clean);
-        const pretty=JSON.stringify(p,null,2);
-        txtEl.className='res-json'; await stream(txtEl,pretty); results[t]=pretty;
-      }catch{txtEl.className='res-text'; await stream(txtEl,raw); results[t]=raw;}
+      try{const p=JSON.parse(clean);const pretty=JSON.stringify(p,null,2);txtEl.className='res-json';await stream(txtEl,pretty);results[t]=pretty;}
+      catch{txtEl.className='res-text';await stream(txtEl,raw);results[t]=raw;}
     } else {
-      txtEl.className='res-text'; await stream(txtEl,raw); results[t]=raw;
+      txtEl.className='res-text';await stream(txtEl,raw);results[t]=raw;
     }
-    if(user){
-      tokens=Math.max(0,tokens-1); prompts++;
-      const db=JSON.parse(localStorage.getItem('pk_users')||'{}');
-      if(db[user.email]){db[user.email].tokens=tokens;db[user.email].prompts=prompts;localStorage.setItem('pk_users',JSON.stringify(db));}
-      refreshNav();
+
+    // Simpan ke Supabase jika login
+    if(currentUser && userProfile){
+      // kurangi token
+      const newTok = Math.max(0, userProfile.tokens - 1);
+      const newPro = userProfile.total_prompts + 1;
+      await sb.from('profiles').update({tokens:newTok,total_prompts:newPro,updated_at:new Date().toISOString()}).eq('id',currentUser.id);
+      // simpan history
+      await sb.from('prompt_history').insert({user_id:currentUser.id,email:userProfile.email,tool_type:t,language:lang,output_format:f});
+      // refresh profile
+      userProfile.tokens=newTok; userProfile.total_prompts=newPro;
+      updateTokenInfoBars(); refreshNav();
     }
     toast('✅ Prompt berhasil dibuat!');
-  }catch(e){
+  } catch(e){
     spin.classList.add('hidden'); txtEl.classList.remove('hidden');
     txtEl.className='res-text';
     let msg='⚠ Error: '+e.message;
-    if(e.message.includes('API_KEY_INVALID')||e.message.includes('400')) msg='⚠ API Key tidak valid.';
+    if(e.message.includes('API_KEY_INVALID')||e.message.includes('400')) msg='⚠ API Key tidak valid. Periksa kembali.';
     else if(e.message.includes('429')) msg='⚠ Kuota API habis. Coba lagi besok.';
     txtEl.textContent=msg; toast(msg);
-  }finally{
+  } finally {
     btn.disabled=false; btn.innerHTML='✨ HASILKAN PROMPT';
   }
 }
 
-function toB64(file){
-  return new Promise((res,rej)=>{
-    const r=new FileReader();
-    r.onload=()=>res(r.result.split(',')[1]);
-    r.onerror=rej; r.readAsDataURL(file);
-  });
-}
-async function stream(el,text){
-  el.textContent='';
-  for(let i=0;i<text.length;i+=8){
-    el.textContent+=text.slice(i,i+8);
-    if(i%80===0) await new Promise(r=>setTimeout(r,1));
-  }
-}
+function toB64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(file);});}
+async function stream(el,text){el.textContent='';for(let i=0;i<text.length;i+=8){el.textContent+=text.slice(i,i+8);if(i%80===0) await new Promise(r=>setTimeout(r,1));}}
 
-// ══════ COPY ══════
+// ══════════════════════════════════════════
+// COPY
+// ══════════════════════════════════════════
 function doCopy(t){
-  const r=results[t]; if(!r) return;
-  const btnMap={img:'cpBtnImg',sh:'cpBtnSh',lv:'cpBtnLv'};
+  const r=results[t];if(!r) return;
+  const map={img:'cpBtnImg',sh:'cpBtnSh',lv:'cpBtnLv'};
   navigator.clipboard.writeText(r).then(()=>{
-    const b=document.getElementById(btnMap[t]);
-    b.textContent='✅ Tersalin!'; b.classList.add('ok');
+    const b=document.getElementById(map[t]);
+    b.textContent='✅ Tersalin!';b.classList.add('ok');
     setTimeout(()=>{b.textContent='📋 Salin';b.classList.remove('ok');},2000);
-    toast('✅ Prompt disalin ke clipboard!');
+    toast('✅ Prompt disalin!');
   });
 }
 
-// ══════ PRICING ══════
+// ══════════════════════════════════════════
+// PRICING
+// ══════════════════════════════════════════
 function switchTab(t){
   document.getElementById('tabTok').classList.toggle('on',t==='token');
   document.getElementById('tabSub').classList.toggle('on',t==='sub');
@@ -1501,58 +1118,158 @@ function switchTab(t){
   document.getElementById('paySec').classList.add('hidden');
   selPlan=null;
 }
-
-const plans={
-  starter:{price:15000,label:'Starter — Rp 15.000 (15 Token)'},
-  popular:{price:45000,label:'Popular — Rp 45.000 (50 Token)'},
-  pro:{price:99000,label:'Pro — Rp 99.000 (100 Token)'},
-  mega:{price:129000,label:'Mega — Rp 129.000 (200 Token)'},
-  basic_sub:{price:29000,label:'Basic Langganan — Rp 29.000/bln'},
-  growth_sub:{price:49000,label:'Growth Langganan — Rp 49.000/bln'},
-  pro_sub:{price:89000,label:'Pro Langganan — Rp 89.000/bln'}
-};
-
 function pickPlan(p){
-  selPlan=p; selPlanPrice=plans[p].price;
-  ['tc0','tc1','tc2','tc3','sc0','sc1','sc2'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el) el.classList.remove('picked');
-  });
-  const cardMap={starter:'tc0',popular:'tc1',pro:'tc2',mega:'tc3',basic_sub:'sc0',growth_sub:'sc1',pro_sub:'sc2'};
-  const el=document.getElementById(cardMap[p]);
-  if(el) el.classList.add('picked');
-  document.getElementById('payLabel').textContent='Rp '+selPlanPrice.toLocaleString('id-ID');
+  selPlan=p;
+  ['tc0','tc1','tc2','tc3','sc0','sc1','sc2'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('picked');});
+  const map={starter:'tc0',popular:'tc1',pro:'tc2',mega:'tc3',basic_sub:'sc0',growth_sub:'sc1',pro_sub:'sc2'};
+  const el=document.getElementById(map[p]);if(el)el.classList.add('picked');
+  document.getElementById('payLabel').textContent='Rp '+plans[p].price.toLocaleString('id-ID');
   document.getElementById('paySec').classList.remove('hidden');
   document.getElementById('paySec').scrollIntoView({behavior:'smooth'});
 }
-
-function doPay(){
+async function doPay(){
   if(!selPlan){toast('⚠ Pilih paket terlebih dahulu.');return;}
-  if(!user){toast('⚠ Login terlebih dahulu untuk pembelian.');go('login');return;}
-  toast('💬 Hubungi admin WhatsApp untuk konfirmasi!'); goWA();
+  if(!currentUser){toast('⚠ Login terlebih dahulu!');go('login');return;}
+  // simpan transaksi pending ke Supabase
+  await sb.from('transactions').insert({
+    user_id:currentUser.id,
+    email:userProfile.email,
+    plan_name:plans[selPlan].label,
+    amount:plans[selPlan].price,
+    tokens_added:plans[selPlan].tokens,
+    status:'pending',
+    note:'Menunggu konfirmasi pembayaran'
+  });
+  toast('📋 Transaksi tercatat! Hubungi admin untuk konfirmasi.');
+  goWA();
 }
 function goWA(){
   const pl=selPlan?plans[selPlan].label:'';
-  const msg=encodeURIComponent(`Halo Admin Prompt Kita, saya ingin membeli paket ${pl}. Email akun saya: ${user?user.email:'[email saya]'}`);
+  const em=currentUser?userProfile.email:'[email saya]';
+  const msg=encodeURIComponent(`Halo Admin Prompt Kita! 👋\n\nSaya ingin membeli paket:\n*${pl}*\n\nEmail akun: ${em}\n\nMohon konfirmasi pembayaran. Terima kasih!`);
   window.open(`https://wa.me/6282277577294?text=${msg}`,'_blank');
 }
 
-// ══════ MODAL ══════
+// ══════════════════════════════════════════
+// ADMIN
+// ══════════════════════════════════════════
+async function loadAdminData(){
+  if(!currentUser || currentUser.email !== ADMIN_EMAIL){toast('⚠ Akses ditolak.');go('home');return;}
+
+  // Load semua user
+  const {data:users} = await sb.from('profiles').select('*').order('created_at',{ascending:false});
+  allUsers = users || [];
+  renderAdminUsers(allUsers);
+
+  // Load transaksi
+  const {data:txs} = await sb.from('transactions').select('*').order('created_at',{ascending:false});
+  const txBody = document.getElementById('adminTxBody');
+  if(!txs||txs.length===0){txBody.innerHTML='<tr><td colspan="6" class="empty-table">Belum ada transaksi.</td></tr>';return;}
+
+  const pending = txs.filter(t=>t.status==='pending').length;
+  const done = txs.filter(t=>t.status==='done').length;
+  document.getElementById('adminTotalUsers').textContent = allUsers.length;
+  document.getElementById('adminTotalPrompts').textContent = allUsers.reduce((a,u)=>a+(u.total_prompts||0),0);
+  document.getElementById('adminPending').textContent = pending;
+  document.getElementById('adminDone').textContent = done;
+
+  txBody.innerHTML = txs.map(tx=>`
+    <tr>
+      <td style="font-size:12px">${tx.email}</td>
+      <td style="font-size:12px">${tx.plan_name.split('—')[0]}</td>
+      <td>Rp ${tx.amount.toLocaleString('id-ID')}</td>
+      <td>${tx.tokens_added}</td>
+      <td><span class="status-badge ${tx.status==='done'?'status-done':tx.status==='pending'?'status-pending':''}">${tx.status}</span>
+        ${tx.status==='pending'?`<button class="btn-sm btn-sm-green" style="margin-left:6px" onclick="approveTx('${tx.id}','${tx.user_id}',${tx.tokens_added})">✓ Approve</button>`:''}
+      </td>
+      <td style="font-size:11px">${new Date(tx.created_at).toLocaleDateString('id-ID',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</td>
+    </tr>`).join('');
+}
+
+function renderAdminUsers(users){
+  const tbody = document.getElementById('adminUsersBody');
+  if(!users||users.length===0){tbody.innerHTML='<tr><td colspan="5" class="empty-table">Belum ada user.</td></tr>';return;}
+  tbody.innerHTML = users.map(u=>`
+    <tr class="user-row">
+      <td style="font-size:13px">${u.email}</td>
+      <td><strong style="color:var(--blue)">${u.tokens}</strong></td>
+      <td>${u.total_prompts||0}</td>
+      <td style="font-size:11px">${new Date(u.created_at).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'})}</td>
+      <td>
+        <div class="add-tok-form">
+          <input type="number" id="tok_${u.id}" placeholder="50" min="1" max="9999"/>
+          <button class="btn-sm btn-sm-blue" onclick="addTokenToUser('${u.id}','${u.email}')">+ Tambah</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function filterUsers(){
+  const q = document.getElementById('searchUser').value.toLowerCase();
+  const filtered = allUsers.filter(u=>u.email.toLowerCase().includes(q));
+  renderAdminUsers(filtered);
+}
+
+async function addTokenToUser(userId, email){
+  const input = document.getElementById('tok_'+userId);
+  const amount = parseInt(input.value);
+  if(!amount||amount<1){toast('⚠ Masukkan jumlah token yang valid.');return;}
+
+  // dapatkan token saat ini
+  const {data:profile} = await sb.from('profiles').select('tokens').eq('id',userId).single();
+  const newTokens = (profile?.tokens||0) + amount;
+
+  const {error} = await sb.from('profiles').update({tokens:newTokens,updated_at:new Date().toISOString()}).eq('id',userId);
+  if(error){toast('⚠ Gagal menambah token: '+error.message);return;}
+
+  // catat sebagai transaksi
+  await sb.from('transactions').insert({user_id:userId,email,plan_name:'Manual by Admin',amount:0,tokens_added:amount,status:'done',note:'Token ditambahkan manual oleh admin'});
+
+  toast(`✅ Berhasil tambah ${amount} token ke ${email}`);
+  input.value='';
+  loadAdminData();
+}
+
+async function approveTx(txId, userId, tokensToAdd){
+  // update status transaksi
+  await sb.from('transactions').update({status:'done'}).eq('id',txId);
+  // tambah token ke user
+  const {data:profile} = await sb.from('profiles').select('tokens').eq('id',userId).single();
+  const newTokens = (profile?.tokens||0) + tokensToAdd;
+  await sb.from('profiles').update({tokens:newTokens,updated_at:new Date().toISOString()}).eq('id',userId);
+  toast(`✅ Transaksi approved! ${tokensToAdd} token ditambahkan.`);
+  loadAdminData();
+}
+
+// ══════════════════════════════════════════
+// NAVIGATE
+// ══════════════════════════════════════════
+function go(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const el=document.getElementById('page-'+page);
+  if(el){el.classList.add('active');window.scrollTo(0,0);}
+  if(page==='tool-image') refreshApiWarnings();
+  if(page==='tool-shorts') document.getElementById('apiBannerSh').classList.toggle('hidden',!!apiKey);
+  if(page==='tool-long') document.getElementById('apiBannerLv').classList.toggle('hidden',!!apiKey);
+}
+
+// ══════════════════════════════════════════
+// MODAL
+// ══════════════════════════════════════════
 function openM(id){document.getElementById(id).classList.add('open');}
 function closeM(id){document.getElementById(id).classList.remove('open');}
 
-// ══════ TOAST ══════
-function toast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),3200);
-}
+// ══════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
+function showErr(el,msg){el.textContent=msg;el.style.display='block';setTimeout(()=>el.style.display='none',4000);}
+function togEye(id,btn){const i=document.getElementById(id);i.type=i.type==='password'?'text':'password';btn.textContent=i.type==='password'?'👁️':'🙈';}
 
-// ══════ INIT ══════
-refreshNav();
-refreshBanner('apiBannerImg');
-refreshBanner('apiBannerSh');
-refreshBanner('apiBannerLv');
+// ══════════════════════════════════════════
+// START
+// ══════════════════════════════════════════
+init();
 </script>
 </body>
 </html>
