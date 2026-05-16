@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tips Prompting — Prompt Kita</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap');
+:root{
+  --bg:#080c14;--bg2:#0d1220;--bg3:#111827;--card:#0f1623;
+  --border:#1e2d45;--border2:#253650;
+  --blue:#3b82f6;--blue2:#2563eb;
+  --blue-bg:rgba(59,130,246,0.08);
+  --text:#f1f5f9;--text2:#94a3b8;--text3:#475569;
+  --accent:#38bdf8;--green:#22c55e;--yellow:#f59e0b;--purple:#a78bfa;--pink:#f472b6;--orange:#fb923c;
+  --head:'Syne',sans-serif;--body:'Plus Jakarta Sans',sans-serif;
+  --r:10px;--r2:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:15px;line-height:1.6;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+
+/* LOCK SCREEN */
+.lock-screen{position:fixed;inset:0;background:var(--bg);z-index:1000;display:flex;align-items:center;justify-content:center;padding:24px;}
+.lock-box{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:44px 40px;width:100%;max-width:400px;text-align:center;}
+.lock-icon{font-size:48px;margin-bottom:16px;}
+.lock-box h2{font-family:var(--head);font-size:24px;font-weight:800;margin-bottom:8px;}
+.lock-box p{color:var(--text2);font-size:14px;margin-bottom:28px;line-height:1.6;}
+.lock-input{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:12px 14px;border-radius:var(--r);font-family:var(--body);font-size:14px;text-align:center;margin-bottom:12px;}
+.lock-input:focus{outline:none;border-color:var(--blue);}
+.lock-btn{width:100%;padding:13px;background:var(--blue);border:none;border-radius:var(--r);color:#fff;font-family:var(--body);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;}
+.lock-btn:hover{background:var(--blue2);}
+.lock-err{color:#f87171;font-size:13px;margin-top:8px;display:none;}
+.lock-note{color:var(--text3);font-size:12px;margin-top:16px;}
+
+/* MAIN CONTENT */
+.main-content{display:none;}
+
+/* SIDEBAR NAV */
+.layout{display:flex;min-height:100vh;}
+.sidebar{
+  width:260px;flex-shrink:0;
+  background:var(--bg2);border-right:1px solid var(--border);
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+  padding:24px 0;
+}
+.sidebar-logo{
+  display:flex;align-items:center;gap:10px;
+  font-family:var(--head);font-size:16px;font-weight:800;
+  padding:0 20px 20px;border-bottom:1px solid var(--border);
+  cursor:pointer;margin-bottom:16px;
+}
+.logo-icon{width:30px;height:30px;background:linear-gradient(135deg,var(--blue),var(--accent));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;}
+.logo span{color:var(--blue);}
+.sidebar-section-title{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--text3);text-transform:uppercase;padding:8px 20px 6px;margin-top:8px;}
+.sidebar-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 20px;cursor:pointer;
+  font-size:13px;color:var(--text2);
+  transition:all .2s;border-left:2px solid transparent;
+  text-decoration:none;
+}
+.sidebar-item:hover{color:var(--text);background:rgba(59,130,246,0.06);}
+.sidebar-item.active{color:var(--blue);background:var(--blue-bg);border-left-color:var(--blue);font-weight:600;}
+.sidebar-item .icon{font-size:14px;width:18px;text-align:center;flex-shrink:0;}
+.sidebar-progress{padding:16px 20px;border-top:1px solid var(--border);margin-top:16px;}
+.progress-label{display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:6px;}
+.progress-bar{background:var(--border);border-radius:999px;height:4px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--accent));border-radius:999px;transition:width .5s;}
+
+/* CONTENT */
+.content{flex:1;min-width:0;padding:48px 48px 80px;}
+.content-inner{max-width:780px;}
+
+/* MODULE */
+.module{display:none;}
+.module.active{display:block;}
+.module-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:4px 12px;border-radius:999px;font-size:11px;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;margin-bottom:16px;
+}
+.badge-blue{background:rgba(59,130,246,.12);color:var(--blue);border:1px solid rgba(59,130,246,.2);}
+.badge-green{background:rgba(34,197,94,.1);color:#4ade80;border:1px solid rgba(34,197,94,.15);}
+.badge-purple{background:rgba(167,139,250,.1);color:var(--purple);border:1px solid rgba(167,139,250,.15);}
+.badge-yellow{background:rgba(245,158,11,.1);color:#fbbf24;border:1px solid rgba(245,158,11,.15);}
+.badge-pink{background:rgba(244,114,182,.1);color:var(--pink);border:1px solid rgba(244,114,182,.15);}
+.badge-orange{background:rgba(251,146,60,.1);color:var(--orange);border:1px solid rgba(251,146,60,.15);}
+.module-title{font-family:var(--head);font-size:clamp(24px,4vw,36px);font-weight:800;line-height:1.15;letter-spacing:-0.02em;margin-bottom:10px;}
+.module-desc{color:var(--text2);font-size:16px;line-height:1.75;margin-bottom:32px;border-bottom:1px solid var(--border);padding-bottom:28px;}
+
+/* CONTENT ELEMENTS */
+h2.section-h{font-family:var(--head);font-size:20px;font-weight:800;margin:32px 0 12px;color:var(--text);}
+h3.sub-h{font-family:var(--head);font-size:16px;font-weight:700;margin:24px 0 10px;color:var(--accent);}
+p.para{color:var(--text2);font-size:14px;line-height:1.85;margin-bottom:14px;}
+strong{color:var(--text);font-weight:600;}
+em{color:var(--yellow);font-style:normal;font-weight:500;}
+
+/* CALLOUT BOX */
+.callout{
+  border-radius:var(--r);padding:16px 18px;margin:20px 0;
+  display:flex;gap:12px;align-items:flex-start;
+}
+.callout-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+.callout-body{flex:1;}
+.callout-body strong{display:block;margin-bottom:4px;font-size:13px;}
+.callout-body p{font-size:13px;line-height:1.6;margin:0;}
+.callout.info{background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.15);}
+.callout.info p,.callout.info strong{color:var(--accent);}
+.callout.tip{background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.12);}
+.callout.tip p,.callout.tip strong{color:#4ade80;}
+.callout.warn{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.15);}
+.callout.warn p,.callout.warn strong{color:#fbbf24;}
+.callout.pro{background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.15);}
+.callout.pro p,.callout.pro strong{color:var(--purple);}
+
+/* CODE / PROMPT BLOCK */
+.prompt-block{
+  background:var(--bg3);border:1px solid var(--border2);
+  border-radius:var(--r2);padding:0;margin:18px 0;
+  overflow:hidden;
+}
+.prompt-block-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 16px;background:var(--bg2);
+  border-bottom:1px solid var(--border);
+}
+.prompt-block-header span{font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--text3);text-transform:uppercase;}
+.copy-prompt-btn{
+  background:transparent;border:1px solid var(--border2);
+  color:var(--text2);padding:4px 10px;border-radius:6px;
+  font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;
+}
+.copy-prompt-btn:hover{border-color:var(--blue);color:var(--blue);}
+.copy-prompt-btn.ok{border-color:var(--green);color:#4ade80;}
+.prompt-text{
+  padding:16px;font-family:monospace;font-size:13px;
+  color:#7dd3fc;line-height:1.7;white-space:pre-wrap;word-break:break-word;
+}
+
+/* CARD GRID */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:20px 0;}
+.info-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:18px 16px;}
+.info-card .ic-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.info-card .ic-emoji{font-size:20px;}
+.info-card h4{font-family:var(--head);font-size:13px;font-weight:700;}
+.info-card p{color:var(--text2);font-size:12px;line-height:1.6;}
+
+/* COMPARISON TABLE */
+.comp-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:13px;}
+.comp-table th{background:var(--bg2);padding:10px 14px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);}
+.comp-table td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text2);}
+.comp-table tr:last-child td{border-bottom:none;}
+.comp-table tr:hover td{background:rgba(255,255,255,0.02);}
+.comp-table .good{color:#4ade80;}
+.comp-table .bad{color:#f87171;}
+.comp-table .ok{color:#fbbf24;}
+
+/* FORMULA BOX */
+.formula{
+  background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(56,189,248,0.04));
+  border:1px solid rgba(59,130,246,0.2);
+  border-radius:var(--r2);padding:20px 24px;margin:20px 0;text-align:center;
+}
+.formula-text{
+  font-family:var(--head);font-size:18px;font-weight:700;
+  color:var(--text);letter-spacing:.02em;line-height:1.6;
+}
+.formula-text .part{
+  display:inline-block;background:rgba(59,130,246,.15);
+  border:1px solid rgba(59,130,246,.2);
+  color:var(--accent);padding:2px 10px;border-radius:6px;margin:2px;
+}
+.formula-text .op{color:var(--text3);margin:0 4px;}
+
+/* STEP LIST */
+.step-list{list-style:none;margin:16px 0;}
+.step-list li{
+  display:flex;gap:14px;align-items:flex-start;
+  padding:14px 0;border-bottom:1px solid var(--border);
+}
+.step-list li:last-child{border-bottom:none;}
+.step-num{
+  width:28px;height:28px;border-radius:8px;
+  background:var(--blue-bg);border:1px solid rgba(59,130,246,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--head);font-size:12px;font-weight:800;color:var(--blue);
+  flex-shrink:0;margin-top:1px;
+}
+.step-content h4{font-family:var(--head);font-size:14px;font-weight:700;margin-bottom:4px;}
+.step-content p{color:var(--text2);font-size:13px;line-height:1.6;}
+
+/* CHECK LIST */
+.check-list{list-style:none;margin:14px 0;}
+.check-list li{display:flex;gap:10px;align-items:flex-start;padding:5px 0;font-size:13px;color:var(--text2);}
+.check-list li::before{content:'✓';color:var(--blue);font-weight:700;flex-shrink:0;margin-top:1px;}
+.check-list li.bad::before{content:'✗';color:#f87171;}
+.check-list li.warn::before{content:'⚡';color:#fbbf24;}
+
+/* QUIZ */
+.quiz-box{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:24px;margin:24px 0;}
+.quiz-q{font-family:var(--head);font-size:15px;font-weight:700;margin-bottom:16px;}
+.quiz-options{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+.quiz-opt{
+  background:var(--bg);border:1px solid var(--border2);
+  border-radius:var(--r);padding:11px 14px;cursor:pointer;
+  font-size:13px;color:var(--text2);transition:all .2s;text-align:left;
+}
+.quiz-opt:hover{border-color:var(--blue);color:var(--text);}
+.quiz-opt.correct{background:rgba(34,197,94,.08);border-color:#4ade80;color:#4ade80;}
+.quiz-opt.wrong{background:rgba(239,68,68,.06);border-color:#f87171;color:#f87171;}
+.quiz-feedback{font-size:13px;padding:10px 14px;border-radius:var(--r);display:none;}
+.quiz-feedback.show{display:block;}
+.quiz-feedback.ok{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.15);color:#4ade80;}
+.quiz-feedback.err{background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.1);color:#f87171;}
+
+/* NAV BOTTOM */
+.nav-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:48px;padding-top:24px;border-top:1px solid var(--border);}
+.nav-btn{
+  display:flex;align-items:center;gap:8px;
+  background:var(--card);border:1px solid var(--border2);
+  color:var(--text2);padding:10px 18px;border-radius:var(--r);
+  cursor:pointer;font-size:13px;font-weight:500;transition:all .2s;
+}
+.nav-btn:hover{border-color:var(--blue);color:var(--blue);}
+.nav-btn.primary{background:var(--blue);border-color:var(--blue);color:#fff;}
+.nav-btn.primary:hover{background:var(--blue2);}
+.module-complete{
+  text-align:center;background:rgba(34,197,94,.06);
+  border:1px solid rgba(34,197,94,.12);
+  border-radius:var(--r2);padding:20px;margin-top:32px;
+}
+.module-complete h4{font-family:var(--head);font-size:16px;font-weight:700;color:#4ade80;margin-bottom:4px;}
+.module-complete p{color:var(--text2);font-size:13px;}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--card);border:1px solid var(--blue);color:var(--text);padding:12px 18px;border-radius:var(--r);font-size:13px;font-weight:500;z-index:999;transform:translateY(80px);opacity:0;transition:all .3s;box-shadow:0 8px 32px rgba(59,130,246,.2);}
+.toast.show{transform:translateY(0);opacity:1;}
+
+/* MOBILE TOGGLE */
+.sidebar-toggle{display:none;position:fixed;bottom:20px;left:20px;z-index:100;background:var(--blue);border:none;color:#fff;width:44px;height:44px;border-radius:50%;font-size:20px;cursor:pointer;box-shadow:0 4px 16px rgba(59,130,246,.4);}
+
+@media(max-width:768px){
+  .sidebar{position:fixed;left:-260px;z-index:50;transition:left .3s;}
+  .sidebar.open{left:0;}
+  .sidebar-toggle{display:flex;align-items:center;justify-content:center;}
+  .content{padding:24px 20px 80px;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOCK SCREEN -->
+<div class="lock-screen" id="lockScreen">
+  <div class="lock-box">
+    <div class="lock-icon">🔐</div>
+    <h2>Tips Prompting</h2>
+    <p>Konten eksklusif untuk member Prompt Kita.<br>Login terlebih dahulu untuk mengakses panduan lengkap.</p>
+    <input class="lock-input" type="email" id="lockEmail" placeholder="Email kamu..." />
+    <input class="lock-input" type="password" id="lockPass" placeholder="Password..." style="margin-top:8px" />
+    <button class="lock-btn" onclick="doLockLogin()">🚀 Masuk & Akses Materi</button>
+    <p class="lock-err" id="lockErr">Email atau password salah.</p>
+    <p class="lock-note">Belum punya akun? <a href="index.html" style="color:var(--blue)">Daftar gratis di Prompt Kita</a></p>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main-content" id="mainContent">
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-logo" onclick="goHome()">
+        <div class="logo-icon">PK</div>
+        <span>PROMPT</span> KITA
+      </div>
+
+      <div class="sidebar-section-title">📚 Kurikulum</div>
+
+      <a class="sidebar-item active" onclick="showModule(0)" id="nav0">
+        <span class="icon">🎯</span> Apa itu Prompt AI?
+      </a>
+      <a class="sidebar-item" onclick="showModule(1)" id="nav1">
+        <span class="icon">🧬</span> Anatomi Prompt Sempurna
+      </a>
+      <a class="sidebar-item" onclick="showModule(2)" id="nav2">
+        <span class="icon">⚡</span> Teknik Prompting Dasar
+      </a>
+      <a class="sidebar-item" onclick="showModule(3)" id="nav3">
+        <span class="icon">🛠</span> Prompt untuk AI Tools
+      </a>
+      <a class="sidebar-item" onclick="showModule(4)" id="nav4">
+        <span class="icon">📸</span> Template Foto & Gambar
+      </a>
+      <a class="sidebar-item" onclick="showModule(5)" id="nav5">
+        <span class="icon">🎬</span> Prompt untuk Video
+      </a>
+      <a class="sidebar-item" onclick="showModule(6)" id="nav6">
+        <span class="icon">❌</span> Kesalahan Umum
+      </a>
+      <a class="sidebar-item" onclick="showModule(7)" id="nav7">
+        <span class="icon">💰</span> Monetisasi dengan AI
+      </a>
+      <a class="sidebar-item" onclick="showModule(8)" id="nav8">
+        <span class="icon">🚀</span> Prompt Cheat Sheet
+      </a>
+
+      <div class="sidebar-progress">
+        <div class="progress-label">
+          <span>Progress Belajar</span>
+          <span id="progressText">0/9</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+      <div class="content-inner">
+
+        <!-- ══ MODULE 0: APA ITU PROMPT ══ -->
+        <div class="module active" id="module0">
+          <div class="module-badge badge-blue">📖 Modul 1 dari 9 · Pemula</div>
+          <h1 class="module-title">Apa itu Prompt AI<br>& Kenapa Kamu Butuh Ini?</h1>
+          <p class="module-desc">Sebelum bisa bikin konten viral dengan AI, kamu harus paham dulu fondasi utamanya: <strong>prompt</strong>. Ini adalah kunci yang membuka semua potensi AI generatif.</p>
+
+          <h2 class="section-h">🤖 Definisi Sederhana</h2>
+          <p class="para"><strong>Prompt</strong> adalah instruksi atau perintah yang kamu berikan ke AI untuk menghasilkan output yang kamu inginkan. Sederhananya: <em>prompt adalah caramu ngobrol dengan AI.</em></p>
+
+          <div class="callout info">
+            <span class="callout-icon">💡</span>
+            <div class="callout-body">
+              <strong>Analogi mudah:</strong>
+              <p>Bayangkan AI seperti asisten desainer kelas dunia yang siap kerja 24 jam. Tapi asisten ini hanya bisa mengikuti instruksimu dengan tepat. Kalau instruksinya jelas → hasil luar biasa. Kalau instruksinya blur → hasil mengecewakan.</p>
+            </div>
+          </div>
+
+          <h2 class="section-h">🎯 Mengapa Prompt Itu Penting?</h2>
+          <div class="card-grid">
+            <div class="info-card">
+              <div class="ic-top"><span class="ic-emoji">⚡</span><h4>Hemat Waktu</h4></div>
+              <p>Desain yang biasanya 3 jam, bisa jadi 3 menit dengan prompt yang tepat.</p>
+            </div>
+            <div class="info-card">
+              <div class="ic-top"><span class="ic-emoji">💎</span><h4>Hasil Profesional</h4></div>
+              <p>Prompt yang baik menghasilkan visual berkualitas studio tanpa skill desain.</p>
+            </div>
+            <div class="info-card">
+              <div class="ic-top"><span class="ic-emoji">🔄</span><h4>Bisa Diulang</h4></div>
+              <p>Prompt yang tersimpan bisa dipakai berulang untuk konsistensi konten.</p>
+            </div>
+            <div class="info-card">
+              <div class="ic-top"><span class="ic-emoji">💰</span><h4>Bernilai Jual</h4></div>
+              <p>Prompt yang bagus bisa dijual atau dijadikan layanan jasa AI.</p>
+            </div>
+          </div>
+
+          <h2 class="section-h">📊 Perbedaan Prompt Biasa vs Prompt Pro</h2>
+          <table class="comp-table">
+            <thead><tr><th>Aspek</th><th>Prompt Biasa</th><th>Prompt Pro</th></tr></thead>
+            <tbody>
+              <tr><td>Contoh</td><td class="bad">"gambar kucing lucu"</td><td class="good">"A fluffy orange tabby cat sitting on a windowsill, golden hour lighting, bokeh background, photorealistic, 85mm lens, Canon EOS R5"</td></tr>
+              <tr><td>Hasil</td><td class="bad">Generik, tidak terprediksi</td><td class="good">Spesifik, konsisten, profesional</td></tr>
+              <tr><td>Kontrol</td><td class="bad">Tidak bisa dikontrol</td><td class="good">Bisa dikustomisasi detail</td></tr>
+              <tr><td>Nilai jual</td><td class="bad">Nol</td><td class="good">Bisa dijual Rp 50rb–500rb/prompt</td></tr>
+            </tbody>
+          </table>
+
+          <h2 class="section-h">🌍 Jenis-jenis AI yang Butuh Prompt</h2>
+          <ul class="check-list">
+            <li><strong>AI Gambar:</strong> Midjourney, DALL-E 3, Stable Diffusion, Adobe Firefly, Leonardo AI</li>
+            <li><strong>AI Video:</strong> Sora, Runway ML, Pika Labs, Kling AI, Veo</li>
+            <li><strong>AI Teks:</strong> ChatGPT, Claude, Gemini, Llama</li>
+            <li><strong>AI Musik:</strong> Suno, Udio, MusicLM</li>
+            <li><strong>AI Kode:</strong> GitHub Copilot, Claude Code, Cursor AI</li>
+          </ul>
+
+          <div class="callout tip">
+            <span class="callout-icon">✅</span>
+            <div class="callout-body">
+              <strong>Kabar baiknya:</strong>
+              <p>Dengan Prompt Kita, kamu tidak perlu belajar nulis prompt dari nol. Upload gambar atau video → AI langsung hasilkan prompt yang siap pakai untuk semua tools di atas!</p>
+            </div>
+          </div>
+
+          <div class="module-complete">
+            <h4>✅ Modul 1 Selesai!</h4>
+            <p>Kamu sudah paham dasar prompt AI. Lanjut ke anatomi prompt yang sempurna!</p>
+          </div>
+          <div class="nav-bottom">
+            <div></div>
+            <button class="nav-btn primary" onclick="nextModule(0)">Modul Berikutnya →</button>
+          </div>
+        </div>
+
+        <!-- ══ MODULE 1: ANATOMI PROMPT ══ -->
+        <div class="module" id="module1">
+          <div class="module-badge badge-green">🧬 Modul 2 dari 9 · Pemula</div>
+          <h1 class="module-title">Anatomi Prompt<br>yang Sempurna</h1>
+          <p class="module-desc">Setiap prompt pro punya struktur tertentu. Pelajari 6 elemen wajib yang membuat promptmu menghasilkan gambar/video yang persis kamu mau.</p>
+
+          <div class="formula">
+            <div class="formula-text">
+              <span class="part">Subjek</span>
+              <span class="op">+</span>
+              <span class="part">Gaya/Style</span>
+              <span class="op">+</span>
+              <span class="part">Pencahayaan</span>
+              <span class="op">+</span>
+              <span class="part">Komposisi</span>
+              <span class="op">+</span>
+              <span class="part">Mood</span>
+              <span class="op">+</span>
+              <span class="part">Detail Teknis</span>
+            </div>
+          </div>
+
+          <h2 class="section-h">1️⃣ Subjek — "Siapa atau Apa?"</h2>
+          <p class="para">Deskripsikan objek utama dengan sangat spesifik. Jangan hanya bilang "wanita", tapi deskripsikan secara detail.</p>
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>❌ Terlalu umum</span></div>
+            <div class="prompt-text">a woman</div>
+          </div>
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>✅ Spesifik dan kuat</span><button class="copy-prompt-btn" onclick="copyPrompt(this)">Salin</button></div>
+            <div class="prompt-text">A 25-year-old Indonesian woman with long black hair, wearing batik kebaya, standing confidently</div>
+          </div>
+
+          <h2 class="section-h">2️⃣ Gaya/Style — "Seperti Apa Tampilannya?"</h2>
+          <p class="para">Style menentukan estetika keseluruhan gambar. Ini salah satu elemen paling berpengaruh.</p>
+          <div class="card-grid">
+            <div class="info-card"><div class="ic-top"><span class="ic-emoji">📷</span><h4>Photorealistic</h4></div><p>Seperti foto asli. Cocok untuk produk, portrait, lifestyle.</p></div>
+            <div class="info-card"><div class="ic-top"><span class="ic-emoji">🎨</span><h4>Digital Art</h4></div><p>Ilustrasi digital. Cocok untuk karakter, fantasi, gaming.</p></div>
+            <div class="info-card"><div class="ic-top"><span class="ic-emoji">🖌</span><h4>Oil Painting</h4></div><p>Lukisan cat minyak. Cocok untuk portrait artistik, landscape.</p></div>
+            <div class="info-card"><div class="ic-top"><span class="ic-emoji">✏️</span><h4>Anime/Manga</h4></div><p>Gaya Jepang. Populer untuk karakter, story visual.</p></div>
+            <div class="info-card"><div class="ic-top"><span class="ic-emoji">🏛</span><h4>Cinematic</h4></div><p>Seperti still frame film. Dramatis dan sinematik.</p></div>
+            <div class="info-card"><div class="ic-top"><span class="ic-emoji">🌈</span><h4>Illustration</h4></div><p>Ilustrasi flat/vektor. Cocok untuk konten sosmed, infografis.</p></div>
+          </div>
+
+          <h2 class="section-h">3️⃣ Pencahayaan — "Bagaimana Cahayanya?"</h2>
+          <ul class="check-list">
+            <li><strong>Golden hour lighting</strong> — cahaya matahari terbenam yang hangat dan dramatis</li>
+            <li><strong>Studio lighting</strong> — pencahayaan profesional terkontrol, cocok untuk produk</li>
+            <li><strong>Dramatic side lighting</strong> — bayangan kuat dari samping, efek sinematik</li>
+            <li><strong>Soft natural light</strong> — cahaya difus yang lembut, cocok untuk portrait</li>
+            <li><strong>Neon lighting</strong> — cahaya warna-warni dramatis, estetik cyberpunk</li>
+            <li><strong>Backlit / Rim lighting</strong> — cahaya dari belakang, efek siluet dramatis</li>
+          </ul>
+
+          <h2 class="section-h">4️⃣ Komposisi — "Bagaimana Posisinya?"</h2>
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>Contoh kata kunci komposisi</span><button class="copy-prompt-btn" onclick="copyPrompt(this)">Salin</button></div>
+            <div class="prompt-text">close-up portrait | wide angle shot | bird's eye view | low angle shot
+rule of thirds | centered composition | symmetrical
+shallow depth of field | bokeh background | sharp focus</div>
+          </div>
+
+          <h2 class="section-h">5️⃣ Mood/Suasana — "Apa yang Dirasakan?"</h2>
+          <ul class="check-list">
+            <li><strong>Serene & peaceful</strong> — tenang, damai, meditasi</li>
+            <li><strong>Epic & dramatic</strong> — megah, intens, powerful</li>
+            <li><strong>Playful & fun</strong> — ceria, colorful, energik</li>
+            <li><strong>Dark & moody</strong> — gelap, misterius, noir</li>
+            <li><strong>Romantic & soft</strong> — hangat, lembut, romantis</li>
+            <li><strong>Minimalist & clean</strong> — bersih, simpel, modern</li>
+          </ul>
+
+          <h2 class="section-h">6️⃣ Detail Teknis — "Spesifikasi Kualitas"</h2>
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>Detail teknis yang sering dipakai</span><button class="copy-prompt-btn" onclick="copyPrompt(this)">Salin</button></div>
+            <div class="prompt-text">8K resolution | ultra detailed | hyperrealistic
+shot on Canon EOS R5 | 85mm lens | f/1.4 aperture
+trending on ArtStation | award winning photography
+--ar 16:9 | --ar 4:5 | --ar 1:1 (untuk Midjourney)
+--q 2 | --stylize 750 (parameter Midjourney)</div>
+          </div>
+
+          <h2 class="section-h">🔥 Contoh Prompt Lengkap (Gabungan 6 Elemen)</h2>
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>✅ Prompt Pro — Portrait Wanita Indonesia</span><button class="copy-prompt-btn" onclick="copyPrompt(this)">Salin</button></div>
+            <div class="prompt-text">A 25-year-old Indonesian woman with long black hair, wearing elegant white batik kebaya, standing in a traditional Javanese garden,
+photorealistic style, golden hour lighting with warm tones, 
+close-up portrait with shallow depth of field, bokeh background with jasmine flowers,
+serene and graceful mood, shot on Canon EOS R5, 85mm lens, f/1.8,
+8K resolution, ultra detailed, --ar 4:5</div>
+          </div>
+
+          <div class="quiz-box">
+            <p class="quiz-q">🧠 Quick Quiz: Elemen mana yang PALING penting untuk menentukan estetika visual sebuah gambar AI?</p>
+            <div class="quiz-options">
+              <button class="quiz-opt" onclick="answerQuiz(this, false, 'mod1')">A. Resolusi (8K, 4K)</button>
+              <button class="quiz-opt" onclick="answerQuiz(this, false, 'mod1')">B. Ukuran file gambar</button>
+              <button class="quiz-opt" onclick="answerQuiz(this, true, 'mod1')">C. Gaya/Style (photorealistic, anime, dll)</button>
+              <button class="quiz-opt" onclick="answerQuiz(this, false, 'mod1')">D. Nama AI yang digunakan</button>
+            </div>
+            <div class="quiz-feedback" id="quiz-mod1"></div>
+          </div>
+
+          <div class="module-complete"><h4>✅ Modul 2 Selesai!</h4><p>Kamu sudah kuasai anatomi prompt. Sekarang pelajari teknik-teknik prompting yang lebih advanced!</p></div>
+          <div class="nav-bottom">
+            <button class="nav-btn" onclick="prevModule(1)">← Sebelumnya</button>
+            <button class="nav-btn primary" onclick="nextModule(1)">Modul Berikutnya →</button>
+          </div>
+        </div>
+
+        <!-- ══ MODULE 2: TEKNIK PROMPTING ══ -->
+        <div class="module" id="module2">
+          <div class="module-badge badge-purple">⚡ Modul 3 dari 9 · Menengah</div>
+          <h1 class="module-title">Teknik Prompting<br>yang Wajib Dikuasai</h1>
+          <p class="module-desc">Ada beberapa teknik prompting yang dipakai para profesional AI. Kuasai ini dan hasilmu akan jauh lebih konsisten dan terprediksi.</p>
+
+          <h2 class="section-h">1. Zero-Shot Prompting</h2>
+          <p class="para">Memberikan instruksi langsung tanpa contoh. Paling simpel, cocok untuk tugas yang jelas.</p>
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>Contoh Zero-Shot</span><button class="copy-prompt-btn" onclick="copyPrompt(this)">Salin</button></div>
+            <div class="prompt-text">Create a product photo of a bottle of coconut oil on a white marble surface, 
+studio lighting, photorealistic, high quality commercial photography</div>
+          </div>
+
+          <h2 class="section-h">2. Few-Shot Prompting</h2>
+          <p class="para">Memberikan beberapa contoh sebelum meminta AI mengikuti pola yang sama. Sangat efektif untuk hasil yang konsisten.</p>
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>Contoh Few-Shot untuk Caption Instagram</span><button class="copy-prompt-btn" onclick="copyPrompt(this)">Salin</button></div>
+            <div class="prompt-text">Buat caption Instagram untuk foto produk skincare. Ikuti pola ini:
+Contoh 1: "Kulit glowing bukan mimpi ✨ Serum vitamin C kami membantu mencerahkan dalam 7 hari. Coba sekarang! #skincare #glowing"
+Contoh 2: "Rahasia kulit sehat ada di sini 🌿 Moisturizer aloe vera kami cocok untuk semua jenis kulit. #naturalbeauty"
+
+Sekarang buat caption untuk: [foto masker wajah charcoal]</div>
+          </div>
+
+          <h2 class="section-h">3. Chain of Thought (Berpikir Bertahap)</h2>
+          <p class="para">Minta AI berpikir step-by-step sebelum memberikan jawaban akhir. Sangat berguna untuk tugas kompleks.</p>
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>Contoh Chain of Thought</span><button class="copy-prompt-btn" onclick="copyPrompt(this)">Salin</button></div>
+            <div class="prompt-text">Saya ingin membuat konten TikTok yang viral tentang skincare routine.
+Pertama, analisis tren skincare yang sedang populer di Indonesia.
+Kedua, identifikasi pain point audiens usia 18-25 tahun.
+Ketiga, buat struktur video 30 detik yang menarik.
+Keempat, tulis script lengkap dengan hook yang kuat di 3 detik pertama.</div>
+          </div>
+
+          <h2 class="section-h">4. Role Prompting</h2>
+          <p class="para">Minta AI berperan sebagai ahli tertentu. Hasilnya jauh lebih spesifik dan berkualitas.</p>
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>Contoh Role Prompting</span><button class="copy-prompt-btn" onclick="copyPrompt(this)">Salin</button></div>
+            <div class="prompt-text">Kamu adalah fotografer produk profesional dengan 10 tahun pengalaman di Jakarta 
+yang spesialisasi di beauty dan skincare brand. 
+Buat brief foto untuk campaign peluncuran serum baru target market: 
+wanita urban usia 25-35 tahun yang concern dengan anti-aging.</div>
+          </div>
+
+          <h2 class="section-h">5. Negative Prompting</h2>
+          <p class="para">Beritahu AI apa yang TIDAK kamu mau. Sangat efektif di Stable Diffusion dan Midjourney.</p>
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>Contoh Negative Prompt (Stable Diffusion)</span><button class="copy-prompt-btn" onclick="copyPrompt(this)">Salin</button></div>
+            <div class="prompt-text">Positive: beautiful indonesian woman, traditional dress, natural smile, outdoor garden
+
+Negative: ugly, deformed, blurry, low quality, watermark, text, 
+extra fingers, mutated hands, bad anatomy, oversaturated, cartoon</div>
+          </div>
+
+          <h2 class="section-h">6. Iterative Prompting</h2>
+          <p class="para">Mulai dari prompt sederhana, lalu tambahkan detail sedikit demi sedikit berdasarkan hasil yang kamu dapat.</p>
+          <ul class="step-list">
+            <li><div class="step-num">1</div><div class="step-content"><h4>Start Simple</h4><p>"A coffee shop in Jakarta" — lihat hasilnya dulu</p></div></li>
+            <li><div class="step-num">2</div><div class="step-content"><h4>Add Style</h4><p>"A cozy coffee shop in Jakarta, photorealistic, warm lighting" — mulai ada karakter</p></div></li>
+            <li><div class="step-num">3</div><div class="step-content"><h4>Add Details</h4><p>"A cozy indie coffee shop in South Jakarta, photorealistic, warm golden lighting, wooden interior, plants everywhere, rainy afternoon outside" — sudah sangat spesifik</p></div></li>
+            <li><div class="step-num">4</div><div class="step-content"><h4>Polish & Finalize</h4><p>Tambahkan detail teknis: resolusi, lens, mood yang tepat</p></div></li>
+          </ul>
+
+          <div class="module-complete"><h4>✅ Modul 3 Selesai!</h4><p>6 teknik prompting sudah di tangan! Sekarang pelajari cara pakai untuk berbagai AI tools.</p></div>
+          <div class="nav-bottom">
+            <button class="nav-btn" onclick="prevModule(2)">← Sebelumnya</button>
+            <button class="nav-btn primary" onclick="nextModule(2)">Modul Berikutnya →</button>
+          </div>
+        </div>
+
+        <!-- ══ MODULE 3: AI TOOLS ══ -->
+        <div class="module" id="module3">
+          <div class="module-badge badge-yellow">🛠 Modul 4 dari 9 · Menengah</div>
+          <h1 class="module-title">Prompt untuk<br>Berbagai AI Tools</h1>
+          <p class="module-desc">Setiap AI tool punya "bahasa" yang sedikit berbeda. Pelajari cara optimal menggunakan prompt di masing-masing platform.</p>
+
+          <h2 class="section-h">🎨 Midjourney</h2>
+          <p class="para">Midjourney adalah AI gambar terbaik untuk artistic dan cinematic style. Punya sistem parameter khusus.</p>
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>Struktur Prompt Midjourney</span><button class="copy-prompt-btn" onclick="copyPrompt(this)">Salin</button></div>
+            <div class="prompt-text">/imagine [deskripsi gambar] --ar [rasio] --style [style] --q [kualitas] --v 6
+
+Contoh:
+/imagine A stunning Indonesian sunset over rice terraces in Bali, 
+aerial drone shot, golden hour, vibrant colors, photorealistic --ar 16:9 --q 2 --v 6
+
+Parameter penting:
+--ar 1:1 (kotak) | --ar 16:9 (landscape) | --ar 4:5 (portrait Instagram)
+--q 0.25 (cepat) | --q 1 (standar) | --q 2 (detail tinggi)
+--stylize 0-1000 (makin tinggi = makin artistik)
+--no [hal yang tidak mau] (negative prompt)</div>
+          </div>
+
+          <h2 class="section-h">🖼 DALL-E 3 (ChatGPT)</h2>
+          <p class="para">DALL-E 3 bisa menerima instruksi natural berbahasa Indonesia. Sangat mudah digunakan.</p>
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>Contoh Prompt DALL-E 3</span><button class="copy-prompt-btn" onclick="copyPrompt(this)">Salin</button></div>
+            <div class="prompt-text">Buat gambar foto produk sabun mandi natural dengan bahan-bahan alaminya 
+(lavender, oatmeal, madu) diletakkan di atas kayu rustic, 
+pencahayaan soft dari jendela, background putih bersih, gaya fotografer produk profesional, 
+resolusi tinggi, untuk konten Instagram ukuran 4:5.</div>
+          </div>
+
+          <h2 class="section-h">🌟 Stable Diffusion</h2>
+          <p class="para">Paling fleksibel dan gratis/murah. Butuh negative prompt yang kuat untuk hasil terbaik.</p>
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>Template Stable Diffusion</span><button class="copy-prompt-btn" onclick="copyPrompt(this)">Salin</button></div>
+            <div class="prompt-text">POSITIVE:
+(masterpiece:1.2), best quality, ultra detailed, 8K, 
+[deskripsi subjek], [style], [pencahayaan], [komposisi],
+highly detailed, sharp focus, professional photography
+
+NEGATIVE:
+(worst quality:2), (low quality:2), blurry, ugly, deformed, 
+extra limbs, bad anatomy, watermark, text, logo, signature,
+oversaturated, bad proportions, mutation</div>
+          </div>
+
+          <h2 class="section-h">🤖 ChatGPT / Claude (AI Teks)</h2>
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>Prompt untuk konten kreator</span><button class="copy-prompt-btn" onclick="copyPrompt(this)">Salin</button></div>
+            <div class="prompt-text">Kamu adalah content strategist viral untuk platform TikTok Indonesia.
+Target audiens: Gen Z usia 18-24 tahun, interest: fashion, beauty, lifestyle.
+
+Buat konten plan untuk 1 minggu (7 hari) dengan format:
+- Hari & tema
+- Hook (3 detik pertama)
+- Konten utama (struktur)
+- CTA (call to action)
+- 5 hashtag relevan
+
+Brand: [nama brand kamu]
+USP: [keunggulan produk/jasa kamu]</div>
+          </div>
+
+          <h2 class="section-h">🎬 AI Video (Runway, Pika, Kling)</h2>
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>Template Prompt Video AI</span><button class="copy-prompt-btn" onclick="copyPrompt(this)">Salin</button></div>
+            <div class="prompt-text">[Shot type], [Subjek] [aksi], [setting/lokasi],
+[pencahayaan], [mood], [camera movement], [style],
+[durasi implisit], cinematic quality
+
+Contoh:
+Close-up shot, a barista pouring latte art into a coffee cup, 
+cozy café in Jakarta, warm golden lighting, peaceful atmosphere,
+slow camera zoom in, photorealistic cinematic style, 
+smooth motion, 4K quality</div>
+          </div>
+
+          <div class="module-complete"><h4>✅ Modul 4 Selesai!</h4><p>Kamu sudah tau cara optimal pakai prompt di semua AI tools utama!</p></div>
+          <div class="nav-bottom">
+            <button class="nav-btn" onclick="prevModule(3)">← Sebelumnya</button>
+            <button class="nav-btn primary" onclick="nextModule(3)">Modul Berikutnya →</button>
+          </div>
+        </div>
+
+        <!-- ══ MODULE 4: TEMPLATE FOTO ══ -->
+        <div class="module" id="module4">
+          <div class="module-badge badge-pink">📸 Modul 5 dari 9 · Langsung Pakai</div>
+          <h1 class="module-title">Template Prompt<br>Foto & Gambar Siap Pakai</h1>
+          <p class="module-desc">Kumpulan template prompt yang langsung bisa kamu copy-paste dan modifikasi sesuai kebutuhan. Semua sudah diuji dan menghasilkan output berkualitas tinggi.</p>
+
+          <h2 class="section-h">📦 Foto Produk</h2>
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>Template Foto Produk Skincare</span><button class="copy-prompt-btn" onclick="copyPrompt(this)">Salin</button></div>
+            <div class="prompt-text">Professional product photography of [nama produk], 
+placed on [surface: white marble/wooden table/glass surface],
+surrounded by [bahan alami/props tematik],
+soft studio lighting with subtle shadows,
+clean white background, minimalist composition,
+commercial photography style, ultra sharp focus,
+shot on Canon EOS R5, 100mm macro lens, f/8,
+8K resolution, ready for e-commerce --ar 1:1</div>
+          </div>
+
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>Template Foto Produk Makanan/Minuman</span><button class="copy-prompt-btn" onclick="copyPrompt(this)">Salin</button></div>
+            <div class="prompt-text">Food photography of [nama makanan/minuman],
+beautifully plated/styled, [props: wooden board/slate/marble],
+warm natural lighting from the left, steam rising (if hot),
+shallow depth of field, bokeh background,
+appetizing and fresh appearance, professional food styling,
+shot from 45-degree angle, lifestyle food photography,
+Nikon D850, 50mm lens, f/2.8, ultra detailed --ar 4:5</div>
+          </div>
+
+          <h2 class="section-h">👤 Portrait & Personal Branding</h2>
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>Template Portrait Profesional</span><button class="copy-prompt-btn" onclick="copyPrompt(this)">Salin</button></div>
+            <div class="prompt-text">Professional headshot of [deskripsi orang],
+wearing [pakaian profesional/smart casual],
+confident and approachable expression,
+natural smile, direct eye contact with camera,
+soft studio lighting, slightly blurred background,
+LinkedIn/personal branding photo style,
+shot on Sony A7R IV, 85mm portrait lens, f/1.8,
+ultra detailed, photorealistic --ar 4:5</div>
+          </div>
+
+          <h2 class="section-h">🌆 Konten Lifestyle & Sosmed</h2>
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>Template Lifestyle Instagram</span><button class="copy-prompt-btn" onclick="copyPrompt(this)">Salin</button></div>
+            <div class="prompt-text">Aesthetic lifestyle photography, [subjek: person/object],
+[aktivitas: enjoying coffee/reading/working from café],
+[lokasi: cozy café Jakarta/Bali beach/modern apartment],
+golden hour warm lighting, candid natural feel,
+muted earth tones color palette, film grain texture,
+Instagram aesthetic, influencer lifestyle photography,
+Fujifilm XT4 with Classic Chrome preset, 35mm lens --ar 4:5</div>
+          </div>
+
+          <h2 class="section-h">🎨 Thumbnail YouTube & Media</h2>
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>Template Thumbnail YouTube Viral</span><button class="copy-prompt-btn" onclick="copyPrompt(this)">Salin</button></div>
+            <div class="prompt-text">YouTube thumbnail design, eye-catching and bold,
+[subjek utama: person with shocked/excited expression],
+[elemen visual: product/money/dramatic scene],
+high contrast colors (red, yellow, orange),
+large empty space on [left/right] for text overlay,
+dramatic lighting, modern graphic style,
+ultra detailed, 4K, --ar 16:9</div>
+          </div>
+
+          <h2 class="section-h">🏢 Konten Brand & Bisnis</h2>
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>Template Brand Identity Visual</span><button class="copy-prompt-btn" onclick="copyPrompt(this)">Salin</button></div>
+            <div class="prompt-text">Brand identity mockup for [nama brand],
+[industri: cafe/fashion/tech startup/beauty],
+color palette: [warna brand kamu],
+minimalist modern design aesthetic,
+logo placement on [packaging/merchandise/storefront],
+professional commercial photography,
+clean and premium look, --ar 16:9</div>
+          </div>
+
+          <div class="callout pro">
+            <span class="callout-icon">💜</span>
+            <div class="callout-body">
+              <strong>Pro Tip: Gunakan Prompt Kita untuk Reverse Engineering!</strong>
+              <p>Punya gambar referensi yang kamu suka? Upload ke Prompt Kita dan AI akan langsung analisis semua elemen-elemennya menjadi prompt yang bisa kamu pakai ulang!</p>
+            </div>
+          </div>
+
+          <div class="module-complete"><h4>✅ Modul 5 Selesai!</h4><p>Template foto lengkap sudah kamu punya. Sekarang pelajari prompt untuk konten video!</p></div>
+          <div class="nav-bottom">
+            <button class="nav-btn" onclick="prevModule(4)">← Sebelumnya</button>
+            <button class="nav-btn primary" onclick="nextModule(4)">Modul Berikutnya →</button>
+          </div>
+        </div>
+
+        <!-- ══ MODULE 5: PROMPT VIDEO ══ -->
+        <div class="module" id="module5">
+          <div class="module-badge badge-blue">🎬 Modul 6 dari 9 · Menengah</div>
+          <h1 class="module-title">Prompt untuk Konten<br>Video & Short-Form</h1>
+          <p class="module-desc">Video adalah konten paling engaging di 2024-2026. Pelajari cara membuat prompt untuk TikTok, Reels, YouTube Shorts, dan video panjang.</p>
+
+          <h2 class="section-h">📱 Anatomy Prompt Video</h2>
+          <div class="formula">
+            <div class="formula-text">
+              <span class="part">Shot Type</span>
+              <span class="op">+</span>
+              <span class="part">Subjek & Aksi</span>
+              <span class="op">+</span>
+              <span class="part">Lokasi</span>
+              <span class="op">+</span>
+              <span class="part">Camera Movement</span>
+              <span class="op">+</span>
+              <span class="part">Mood & Style</span>
+            </div>
+          </div>
+
+          <h2 class="section-h">🎥 Jenis Shot & Camera Movement</h2>
+          <table class="comp-table">
+            <thead><tr><th>Shot Type</th><th>Penggunaan</th><th>Efek</th></tr></thead>
+            <tbody>
+              <tr><td>Extreme close-up (ECU)</td><td>Detail produk, mata, tekstur</td><td class="good">Intim, detail</td></tr>
+              <tr><td>Close-up (CU)</td><td>Ekspresi wajah, produk kecil</td><td class="good">Emosional</td></tr>
+              <tr><td>Medium shot (MS)</td><td>Orang dari pinggang ke atas</td><td class="ok">Standar, komunikatif</td></tr>
+              <tr><td>Wide shot (WS)</td><td>Lokasi, aktivitas, establishing</td><td class="ok">Kontekstual</td></tr>
+              <tr><td>Aerial/drone shot</td><td>Landscape, properti, event</td><td class="good">Epic, megah</td></tr>
+            </tbody>
+          </table>
+
+          <h2 class="section-h">🎵 Template TikTok & Reels</h2>
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>Template Video Tutorial/How-To</span><button class="copy-prompt-btn" onclick="copyPrompt(this)">Salin</button></div>
+            <div class="prompt-text">Cinematic vertical video (9:16), 
+close-up shots of hands [melakukan aktivitas: memasak/merias/membuat kerajinan],
+bright and cheerful lighting, clean modern kitchen/studio,
+smooth slow motion at key moments,
+lifestyle aesthetic, warm color grading,
+quick cut transitions, trendy and engaging,
+perfect for TikTok/Instagram Reels, 4K quality</div>
+          </div>
+
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>Template Video Transformasi (Before-After)</span><button class="copy-prompt-btn" onclick="copyPrompt(this)">Salin</button></div>
+            <div class="prompt-text">Split-screen video transformation,
+LEFT: before state [kondisi awal: messy room/bare face/old design],
+RIGHT: after state [hasil transformasi: organized/makeup done/new design],
+dramatic reveal lighting, satisfying transition,
+clean modern aesthetic, high contrast between before and after,
+vertical format 9:16, TikTok style, 4K</div>
+          </div>
+
+          <h2 class="section-h">📺 Template YouTube (Horizontal)</h2>
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>Template Cinematic YouTube Intro</span><button class="copy-prompt-btn" onclick="copyPrompt(this)">Salin</button></div>
+            <div class="prompt-text">Cinematic YouTube intro video (16:9),
+establishing wide shot of [lokasi: kota/studio/alam],
+smooth dolly/tracking camera movement,
+epic orchestral/dramatic music implied,
+color graded in [tone: warm/cool/neutral],
+professional film quality, 4K UHD,
+opening shot yang langsung menarik perhatian dalam 3 detik,
+cinematic lens flare, film grain texture</div>
+          </div>
+
+          <h2 class="section-h">🌅 Prompt untuk Analisis Video dengan Prompt Kita</h2>
+          <div class="callout tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-body">
+              <strong>Cara terbaik pakai Prompt Kita untuk video:</strong>
+              <p>Upload video viral yang kamu temukan → Prompt Kita akan menganalisis setiap elemen visual, cinematography, lighting, dan style → hasilkan prompt yang bisa kamu pakai untuk recreate video serupa dengan AI video generator!</p>
+            </div>
+          </div>
+
+          <div class="module-complete"><h4>✅ Modul 6 Selesai!</h4><p>Prompt video sudah dikuasai. Sekarang pelajari kesalahan yang sering dilakukan kreator pemula!</p></div>
+          <div class="nav-bottom">
+            <button class="nav-btn" onclick="prevModule(5)">← Sebelumnya</button>
+            <button class="nav-btn primary" onclick="nextModule(5)">Modul Berikutnya →</button>
+          </div>
+        </div>
+
+        <!-- ══ MODULE 6: KESALAHAN UMUM ══ -->
+        <div class="module" id="module6">
+          <div class="module-badge badge-orange">❌ Modul 7 dari 9 · Penting!</div>
+          <h1 class="module-title">7 Kesalahan Umum<br>yang Wajib Dihindari</h1>
+          <p class="module-desc">Belajar dari kesalahan orang lain lebih efisien. Ini adalah 7 kesalahan paling umum yang dilakukan kreator Indonesia saat prompt AI.</p>
+
+          <h3 class="sub-h">❌ Kesalahan #1: Prompt Terlalu Singkat</h3>
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>❌ Salah</span></div>
+            <div class="prompt-text">foto produk kopi</div>
+          </div>
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>✅ Benar</span><button class="copy-prompt-btn" onclick="copyPrompt(this)">Salin</button></div>
+            <div class="prompt-text">Professional product photography of artisan single-origin coffee beans 
+in a rustic ceramic cup, steam rising, wooden café table, 
+warm morning light from window, shallow depth of field, 
+premium coffee brand aesthetic --ar 4:5</div>
+          </div>
+
+          <h3 class="sub-h">❌ Kesalahan #2: Tidak Menyebut Style</h3>
+          <p class="para">Tanpa menyebut style, AI akan menggunakan default-nya yang sering tidak sesuai keinginan.</p>
+          <ul class="check-list">
+            <li class="bad">Tidak menyebut style → hasil random dan tidak konsisten</li>
+            <li>Selalu tentukan: photorealistic / digital art / cinematic / illustration dll</li>
+          </ul>
+
+          <h3 class="sub-h">❌ Kesalahan #3: Deskripsi Kontradiksi</h3>
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>❌ Kontradiksi</span></div>
+            <div class="prompt-text">dark moody atmosphere with bright cheerful lighting and happy colors</div>
+          </div>
+          <p class="para">Dark moody dan bright cheerful adalah kebalikan. AI akan bingung dan hasilnya tidak konsisten. Pilih satu mood yang jelas.</p>
+
+          <h3 class="sub-h">❌ Kesalahan #4: Terlalu Banyak Elemen Sekaligus</h3>
+          <p class="para">AI punya keterbatasan. Jika prompt terlalu panjang dan kompleks, beberapa elemen akan diabaikan.</p>
+          <div class="callout warn">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-body">
+              <strong>Aturan praktis:</strong>
+              <p>Maksimal 3-5 elemen utama per prompt. Jika butuh lebih banyak detail, pakai teknik iterative prompting — mulai simpel, tambah detail bertahap.</p>
+            </div>
+          </div>
+
+          <h3 class="sub-h">❌ Kesalahan #5: Tidak Pakai Negative Prompt</h3>
+          <p class="para">Terutama di Stable Diffusion, negative prompt sangat krusial untuk menghindari hasil yang cacat.</p>
+          <ul class="check-list">
+            <li class="warn">Tanpa negative prompt → sering muncul jari yang cacat, wajah aneh, teks random</li>
+            <li>Selalu tambahkan: "bad anatomy, deformed, extra fingers, blurry, watermark"</li>
+          </ul>
+
+          <h3 class="sub-h">❌ Kesalahan #6: Tidak Menyimpan Prompt yang Berhasil</h3>
+          <p class="para">Banyak kreator yang menemukan prompt sempurna tapi tidak menyimpannya, lalu lupa dan tidak bisa recreate hasilnya.</p>
+          <div class="callout tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-body">
+              <strong>Solusi:</strong>
+              <p>Buat "prompt library" pribadi di Notion, Google Docs, atau Notes HP. Kategorikan per type: produk, portrait, landscape, dll. Ini aset berharga yang bisa dijual atau digunakan berulang!</p>
+            </div>
+          </div>
+
+          <h3 class="sub-h">❌ Kesalahan #7: Langsung Puas dengan Hasil Pertama</h3>
+          <p class="para">AI selalu bisa diperfinalisasi. Generate 4-10 variasi, pilih yang terbaik, lalu refinement lebih lanjut.</p>
+          <ul class="check-list">
+            <li>Generate minimal 4 variasi setiap prompt</li>
+            <li>Pilih hasil terbaik, lalu iterate dan perhalus</li>
+            <li>Ubah seed/variation untuk eksplorasi lebih lanjut</li>
+          </ul>
+
+          <div class="module-complete"><h4>✅ Modul 7 Selesai!</h4><p>Kamu sudah tau kesalahan yang harus dihindari. Sekarang pelajari cara monetisasi skill prompting kamu!</p></div>
+          <div class="nav-bottom">
+            <button class="nav-btn" onclick="prevModule(6)">← Sebelumnya</button>
+            <button class="nav-btn primary" onclick="nextModule(6)">Modul Berikutnya →</button>
+          </div>
+        </div>
+
+        <!-- ══ MODULE 7: MONETISASI ══ -->
+        <div class="module" id="module7">
+          <div class="module-badge badge-green">💰 Modul 8 dari 9 · Bisnis</div>
+          <h1 class="module-title">Monetisasi Skill<br>Prompting AI kamu</h1>
+          <p class="module-desc">Skill prompting yang bagus bisa menghasilkan uang nyata. Ini 6 cara konkret monetisasi yang sudah terbukti berhasil di Indonesia.</p>
+
+          <h2 class="section-h">💼 1. Jasa Prompt AI Freelance</h2>
+          <p class="para">Tawarkan jasa pembuatan prompt custom untuk bisnis dan kreator lain.</p>
+          <div class="card-grid">
+            <div class="info-card"><div class="ic-top"><span class="ic-emoji">💵</span><h4>Harga Pasar</h4></div><p>Rp 50rb – 500rb per prompt. Package: Rp 500rb – 3jt untuk 10-20 prompt set.</p></div>
+            <div class="info-card"><div class="ic-top"><span class="ic-emoji">🎯</span><h4>Target Klien</h4></div><p>UMKM, brand skincare/fashion, restoran, fotografer, YouTuber.</p></div>
+            <div class="info-card"><div class="ic-top"><span class="ic-emoji">📣</span><h4>Cara Promosi</h4></div><p>LinkedIn, Instagram portfolio, Fiverr, komunitas bisnis Indonesia.</p></div>
+          </div>
+
+          <h2 class="section-h">📦 2. Jual Prompt Pack</h2>
+          <p class="para">Buat koleksi prompt yang dikurasi untuk niche tertentu dan jual sebagai produk digital.</p>
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>Contoh Prompt Pack yang Laku</span></div>
+            <div class="prompt-text">📦 "100 Prompt Foto Produk Skincare Indonesia" — Rp 150.000
+📦 "50 Prompt Konten TikTok Viral" — Rp 99.000  
+📦 "30 Prompt Portrait Profesional" — Rp 75.000
+📦 "Template Prompt YouTube Thumbnail" — Rp 49.000
+
+Platform jual: Gumroad, Tokopedia Digital, WhatsApp Channel, Instagram Shop</div>
+          </div>
+
+          <h2 class="section-h">🎓 3. Kelas Online Prompting</h2>
+          <p class="para">Setelah kuasai skill ini, ajarkan ke orang lain. Demand sangat tinggi di Indonesia.</p>
+          <ul class="check-list">
+            <li><strong>Webinar 2 jam</strong> — Rp 50rb – 150rb/peserta × 20-100 peserta = Rp 1jt – 15jt</li>
+            <li><strong>Kelas rekaman</strong> — Jual di Skillshare, Udemy, atau platform sendiri</li>
+            <li><strong>1-on-1 coaching</strong> — Rp 300rb – 1jt/sesi via Zoom</li>
+          </ul>
+
+          <h2 class="section-h">🎨 4. Jual Karya AI Art</h2>
+          <p class="para">Prompt yang bagus menghasilkan gambar yang bisa dijual sebagai produk.</p>
+          <ul class="check-list">
+            <li><strong>NFT / Digital Art</strong> — di platform OpenSea, Rarible</li>
+            <li><strong>Print on Demand</strong> — kaos, poster, stiker di Redbubble, Merch by Amazon</li>
+            <li><strong>Stock Photo AI</strong> — di Adobe Stock, Shutterstock (cek kebijakan terbaru)</li>
+            <li><strong>Dekorasi Digital</strong> — wallpaper, template Canva premium</li>
+          </ul>
+
+          <h2 class="section-h">📱 5. Konten Kreator AI</h2>
+          <p class="para">Buat konten "behind the scenes" pembuatan prompt dan karya AI. Sangat viral sekarang.</p>
+          <div class="callout info">
+            <span class="callout-icon">💡</span>
+            <div class="callout-body">
+              <strong>Konten yang viral untuk niche AI di Indonesia:</strong>
+              <p>"Cara bikin foto produk tanpa kamera" • "Gaji desainer digantikan AI?" • "Challenge: AI vs Fotografer profesional" • "Tutorial prompt untuk pemula" • "5 AI tools gratis untuk UMKM"</p>
+            </div>
+          </div>
+
+          <h2 class="section-h">🤝 6. Konsultan AI untuk Bisnis</h2>
+          <p class="para">Bantu bisnis mengintegrasikan AI ke workflow mereka. Ini paling menghasilkan.</p>
+          <ul class="check-list">
+            <li>Audit kebutuhan konten visual bisnis</li>
+            <li>Setup workflow AI untuk tim marketing mereka</li>
+            <li>Training karyawan cara pakai AI tools</li>
+            <li><strong>Rate: Rp 2jt – 10jt per proyek atau Rp 3jt – 8jt/bulan retainer</strong></li>
+          </ul>
+
+          <div class="module-complete"><h4>✅ Modul 8 Selesai!</h4><p>Sekarang kamu punya semua yang dibutuhkan! Akses Cheat Sheet lengkap di modul terakhir.</p></div>
+          <div class="nav-bottom">
+            <button class="nav-btn" onclick="prevModule(7)">← Sebelumnya</button>
+            <button class="nav-btn primary" onclick="nextModule(7)">Modul Terakhir →</button>
+          </div>
+        </div>
+
+        <!-- ══ MODULE 8: CHEAT SHEET ══ -->
+        <div class="module" id="module8">
+          <div class="module-badge badge-purple">🚀 Modul 9 dari 9 · Master Reference</div>
+          <h1 class="module-title">Prompt Cheat Sheet<br>Lengkap — Save This!</h1>
+          <p class="module-desc">Referensi cepat semua kata kunci prompt yang paling sering dipakai. Bookmark halaman ini!</p>
+
+          <h2 class="section-h">🎨 Style Keywords</h2>
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>Semua Style Populer</span><button class="copy-prompt-btn" onclick="copyPrompt(this)">Salin</button></div>
+            <div class="prompt-text">REALISTIC: photorealistic | hyperrealistic | ultra realistic | lifelike
+ARTISTIC: digital art | concept art | illustration | oil painting | watercolor
+CINEMATIC: cinematic | film noir | movie still | dramatic | epic
+MODERN: minimalist | contemporary | modern | clean | sleek
+VINTAGE: retro | vintage | film grain | lomography | polaroid
+ANIME: anime | manga | Studio Ghibli style | chibi | cel-shading
+3D: 3D render | CGI | Pixar style | octane render | unreal engine 5
+PHOTOGRAPHY: DSLR | mirrorless | shot on iPhone | documentary | street photography</div>
+          </div>
+
+          <h2 class="section-h">💡 Lighting Keywords</h2>
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>Semua Kata Kunci Pencahayaan</span><button class="copy-prompt-btn" onclick="copyPrompt(this)">Salin</button></div>
+            <div class="prompt-text">NATURAL: golden hour | blue hour | soft natural light | overcast lighting | sunrise
+STUDIO: studio lighting | softbox | ring light | rembrandt lighting | butterfly lighting
+DRAMATIC: side lighting | chiaroscuro | dramatic shadows | backlit | rim lighting
+SPECIAL: neon lighting | candlelight | moonlight | fire light | bioluminescent | volumetric light
+QUALITY: well-lit | bright | dark | moody | high contrast | low contrast</div>
+          </div>
+
+          <h2 class="section-h">📸 Camera & Lens Keywords</h2>
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>Kamera & Lensa Profesional</span><button class="copy-prompt-btn" onclick="copyPrompt(this)">Salin</button></div>
+            <div class="prompt-text">CAMERAS: Canon EOS R5 | Sony A7R IV | Nikon D850 | Fujifilm XT4 | Hasselblad
+LENSES: 14mm wide angle | 35mm street | 50mm standard | 85mm portrait | 100mm macro | 200mm telephoto
+SETTINGS: f/1.4 | f/2.8 | f/8 | ISO 100 | long exposure | slow shutter
+EFFECTS: bokeh | depth of field | lens flare | motion blur | tilt-shift</div>
+          </div>
+
+          <h2 class="section-h">🎭 Mood & Atmosphere Keywords</h2>
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>Semua Mood</span><button class="copy-prompt-btn" onclick="copyPrompt(this)">Salin</button></div>
+            <div class="prompt-text">POSITIVE: serene | joyful | peaceful | uplifting | romantic | dreamy | magical
+DRAMATIC: epic | intense | powerful | majestic | awe-inspiring | cinematic
+DARK: moody | mysterious | haunting | eerie | noir | melancholic | gloomy
+ENERGETIC: vibrant | dynamic | energetic | bold | exciting | festive
+PREMIUM: luxurious | sophisticated | elegant | refined | high-end | exclusive</div>
+          </div>
+
+          <h2 class="section-h">📐 Composition Keywords</h2>
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>Komposisi & Framing</span><button class="copy-prompt-btn" onclick="copyPrompt(this)">Salin</button></div>
+            <div class="prompt-text">FRAMING: rule of thirds | centered | symmetrical | leading lines | frame within frame
+ANGLES: eye level | low angle | high angle | bird's eye view | worm's eye view | dutch angle
+DISTANCE: extreme close-up | close-up | medium shot | wide shot | establishing shot | panoramic
+FOCUS: sharp focus | shallow DOF | deep focus | selective focus | bokeh</div>
+          </div>
+
+          <h2 class="section-h">⚙️ Quality & Technical Keywords</h2>
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>Kualitas Maksimal</span><button class="copy-prompt-btn" onclick="copyPrompt(this)">Salin</button></div>
+            <div class="prompt-text">RESOLUTION: 8K | 4K | ultra HD | high resolution | ultra detailed
+QUALITY: masterpiece | best quality | professional | award winning | trending on ArtStation
+RENDERING: hyperdetailed | intricate details | sharp | crystal clear | flawless
+SPECIAL: --ar 16:9 | --ar 4:5 | --ar 1:1 | --q 2 | --stylize 750 (Midjourney)</div>
+          </div>
+
+          <h2 class="section-h">🇮🇩 Prompt Bertema Indonesia</h2>
+          <div class="prompt-block">
+            <div class="prompt-block-header"><span>Template Konten Lokal Indonesia</span><button class="copy-prompt-btn" onclick="copyPrompt(this)">Salin</button></div>
+            <div class="prompt-text">LOKASI: Bali rice terraces | Jakarta skyline | Yogyakarta temples | Raja Ampat ocean | Bromo volcano
+BUDAYA: batik pattern | wayang art | gamelan | traditional ceremony | Javanese architecture
+KULINER: nasi goreng | rendang | sate | gado-gado | martabak | es teh manis
+PEOPLE: Indonesian model | local beauty | traditional dress | kebaya | sarung | batik</div>
+          </div>
+
+          <div class="callout pro">
+            <span class="callout-icon">🏆</span>
+            <div class="callout-body">
+              <strong>Kamu sudah menyelesaikan semua modul! 🎉</strong>
+              <p>Sekarang praktikkan langsung. Upload gambar atau video ke tool Prompt Kita, dan gunakan cheat sheet ini untuk memahami & memodifikasi prompt yang dihasilkan AI. Semakin sering berlatih, semakin mahir!</p>
+            </div>
+          </div>
+
+          <div style="text-align:center;margin-top:32px;">
+            <button class="nav-btn primary" style="margin:0 auto;" onclick="goHome()">
+              🚀 Mulai Buat Prompt Sekarang
+            </button>
+          </div>
+          <div class="nav-bottom">
+            <button class="nav-btn" onclick="prevModule(8)">← Sebelumnya</button>
+            <div></div>
+          </div>
+        </div>
+
+      </div><!-- content-inner -->
+    </div><!-- content -->
+  </div><!-- layout -->
+</div><!-- main-content -->
+
+<button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// CONFIG — sama dengan promptkita.html
+const SUPABASE_URL = 'https://qlgyjjqlzfdpuliojkdz.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFsZ3lqanFsemZkcHVsaW9qa2R6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MjM5NjgsImV4cCI6MjA5NDI5OTk2OH0.2Da6aCBpG325d9IKicBAGlIYP3eQC0ikFe1EU3ljVl0';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentModule = 0;
+let completedModules = new Set();
+const TOTAL = 9;
+
+// ── AUTH CHECK ──
+async function checkAuth() {
+  // Cek session Supabase dulu
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    unlock();
+    return;
+  }
+  // Cek localStorage fallback
+  const saved = localStorage.getItem('pk_tips_auth');
+  if (saved === 'true') { unlock(); return; }
+  // Tampilkan lock screen
+  document.getElementById('lockScreen').style.display = 'flex';
+}
+
+async function doLockLogin() {
+  const em = document.getElementById('lockEmail').value.trim();
+  const pw = document.getElementById('lockPass').value;
+  const err = document.getElementById('lockErr');
+  if (!em || !pw) { err.style.display='block'; err.textContent='Isi email dan password.'; return; }
+
+  const { data, error } = await sb.auth.signInWithPassword({ email: em, password: pw });
+  if (error) {
+    err.style.display = 'block';
+    err.textContent = 'Email atau password salah.';
+    return;
+  }
+  localStorage.setItem('pk_tips_auth', 'true');
+  unlock();
+}
+
+function unlock() {
+  document.getElementById('lockScreen').style.display = 'none';
+  document.getElementById('mainContent').style.display = 'block';
+  loadProgress();
+}
+
+// ── NAVIGATION ──
+function showModule(idx) {
+  document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('module'+idx).classList.add('active');
+  document.getElementById('nav'+idx).classList.add('active');
+  currentModule = idx;
+  completedModules.add(idx);
+  saveProgress();
+  updateProgress();
+  window.scrollTo(0, 0);
+  // Close sidebar on mobile
+  document.getElementById('sidebar').classList.remove('open');
+}
+
+function nextModule(from) {
+  if (from < TOTAL - 1) showModule(from + 1);
+}
+function prevModule(from) {
+  if (from > 0) showModule(from - 1);
+}
+function goHome() {
+  window.location.href = 'index.html';
+}
+
+// ── PROGRESS ──
+function saveProgress() {
+  localStorage.setItem('pk_tips_progress', JSON.stringify([...completedModules]));
+}
+function loadProgress() {
+  const saved = localStorage.getItem('pk_tips_progress');
+  if (saved) {
+    try {
+      const arr = JSON.parse(saved);
+      arr.forEach(i => completedModules.add(i));
+      // Mark completed in sidebar
+      arr.forEach(i => {
+        const nav = document.getElementById('nav'+i);
+        if (nav && !nav.querySelector('.done-mark')) {
+          nav.insertAdjacentHTML('beforeend', '<span class="done-mark" style="margin-left:auto;color:#4ade80;font-size:12px;">✓</span>');
+        }
+      });
+    } catch(e) {}
+  }
+  updateProgress();
+}
+function updateProgress() {
+  const pct = Math.round((completedModules.size / TOTAL) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = completedModules.size + '/' + TOTAL;
+}
+
+// ── COPY PROMPT ──
+function copyPrompt(btn) {
+  const block = btn.closest('.prompt-block');
+  const text = block.querySelector('.prompt-text').textContent;
+  const doSuccess = () => {
+    btn.textContent = '✓ Tersalin!'; btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = 'Salin'; btn.classList.remove('ok'); }, 2000);
+    showToast('✅ Prompt disalin ke clipboard!');
+  };
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(doSuccess).catch(() => fallbackCopy(text, doSuccess));
+  } else {
+    fallbackCopy(text, doSuccess);
+  }
+}
+function fallbackCopy(text, cb) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;top:-9999px;opacity:0;';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); cb(); } catch(e) {}
+  document.body.removeChild(ta);
+}
+
+// ── QUIZ ──
+function answerQuiz(btn, isCorrect, quizId) {
+  const box = btn.closest('.quiz-box');
+  const feedback = box.querySelector('.quiz-feedback');
+  box.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+  if (isCorrect) {
+    btn.classList.add('correct');
+    feedback.className = 'quiz-feedback show ok';
+    feedback.textContent = '✅ Benar! Gaya/Style adalah elemen paling menentukan estetika visual karena langsung mengontrol "look and feel" keseluruhan gambar.';
+    showToast('🎉 Jawaban benar!');
+  } else {
+    btn.classList.add('wrong');
+    feedback.className = 'quiz-feedback show err';
+    feedback.textContent = '❌ Kurang tepat. Jawaban yang benar adalah C: Gaya/Style. Ini yang paling menentukan estetika visual.';
+  }
+}
+
+// ── SIDEBAR TOGGLE ──
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// INIT
+checkAuth();
+</script>
+</body>
+</html>
