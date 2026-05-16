@@ -451,7 +451,7 @@ footer{border-top:1px solid var(--border);padding:48px 32px 32px;margin-top:80px
 <!-- ══ TOOL IMAGE ══ -->
 <div class="page" id="page-tool-image">
   <div class="tool-page">
-    <div class="tool-header"><h1>PROMPT DARI <span>FOTO & GAMBAR</span></h1><p>PROMPT KITA · POWERED BY GEMINI 2.0</p></div>
+    <div class="tool-header"><h1>PROMPT DARI <span>FOTO & GAMBAR</span></h1><p>PROMPT KITA · POWERED BY GEMINI </p></div>
     <div class="tok-info"><span class="left">💎 Token kamu</span><span class="right" id="tokImg">—</span></div>
     <div class="no-tok-warn hidden" id="noTokImg"><p>⚠️ Token kamu habis! Beli token untuk melanjutkan.</p><button onclick="go('pricing')">Beli Token</button></div>
     <div id="upWrapImg"><div class="upload-zone" ondragover="doDrag(event)" ondrop="doDrop(event,'img')"><input type="file" accept="image/*" onchange="pickFile(event,'img')"/><div class="upload-icon-box">⬆️</div><h3>Klik untuk mengunggah gambar</h3><p>PNG, JPG, WEBP, GIF · Maks. 20MB</p></div></div>
@@ -471,7 +471,7 @@ footer{border-top:1px solid var(--border);padding:48px 32px 32px;margin-top:80px
 <!-- ══ TOOL SHORTS ══ -->
 <div class="page" id="page-tool-shorts">
   <div class="tool-page">
-    <div class="tool-header"><h1>PROMPT DARI <span>SHORTS VIDEO</span></h1><p>PROMPT KITA · POWERED BY GEMINI 2.0</p></div>
+    <div class="tool-header"><h1>PROMPT DARI <span>SHORTS VIDEO</span></h1><p>PROMPT KITA · POWERED BY GEMINI </p></div>
     <div class="tok-info"><span class="left">💎 Token kamu</span><span class="right" id="tokSh">—</span></div>
     <div class="no-tok-warn hidden" id="noTokSh"><p>⚠️ Token kamu habis!</p><button onclick="go('pricing')">Beli Token</button></div>
     <div id="upWrapSh"><div class="upload-zone" ondragover="doDrag(event)" ondrop="doDrop(event,'sh')"><input type="file" accept="video/*" onchange="pickFile(event,'sh')"/><div class="upload-icon-box">⬆️</div><h3>Klik untuk mengunggah video</h3><p>MP4, MOV, WEBM · Maks. 50MB</p></div></div>
@@ -491,7 +491,7 @@ footer{border-top:1px solid var(--border);padding:48px 32px 32px;margin-top:80px
 <!-- ══ TOOL LONG ══ -->
 <div class="page" id="page-tool-long">
   <div class="tool-page">
-    <div class="tool-header"><h1>PROMPT DARI <span>LONG VIDEO</span></h1><p>PROMPT KITA · POWERED BY GEMINI 2.0</p></div>
+    <div class="tool-header"><h1>PROMPT DARI <span>LONG VIDEO</span></h1><p>PROMPT KITA · POWERED BY GEMINI </p></div>
     <div class="tok-info"><span class="left">💎 Token kamu</span><span class="right" id="tokLv">—</span></div>
     <div class="no-tok-warn hidden" id="noTokLv"><p>⚠️ Token kamu habis!</p><button onclick="go('pricing')">Beli Token</button></div>
     <div id="upWrapLv"><div class="upload-zone" ondragover="doDrag(event)" ondrop="doDrop(event,'lv')"><input type="file" accept="video/*" onchange="pickFile(event,'lv')"/><div class="upload-icon-box">⬆️</div><h3>Klik untuk mengunggah video</h3><p>MP4, MOV, WEBM · Maks. 100MB</p></div></div>
@@ -647,7 +647,7 @@ footer{border-top:1px solid var(--border);padding:48px 32px 32px;margin-top:80px
     <div class="about-grid">
       <div class="about-card"><div class="about-card-ic">🎯</div><h4>Misi</h4><p>Membuat AI generatif mudah diakses oleh semua kreator Indonesia.</p></div>
       <div class="about-card"><div class="about-card-ic">✨</div><h4>Visi</h4><p>Menjadi platform prompt AI nomor satu di Indonesia.</p></div>
-      <div class="about-card"><div class="about-card-ic">⚡</div><h4>Teknologi</h4><p>Didukung Google Gemini 2.0 untuk hasil analisis visual yang akurat.</p></div>
+      <div class="about-card"><div class="about-card-ic">⚡</div><h4>Teknologi</h4><p>Didukung Google Gemini untuk hasil analisis visual yang akurat.</p></div>
       <div class="about-card"><div class="about-card-ic">🤝</div><h4>Komunitas</h4><p>Dibangun untuk dan bersama komunitas kreator & AI enthusiast Indonesia.</p></div>
     </div>
     <div class="contact-card">
@@ -681,7 +681,7 @@ const SUPABASE_URL  = 'https://qlgyjjqlzfdpuliojkdz.supabase.co';
 const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFsZ3lqanFsemZkcHVsaW9qa2R6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MjM5NjgsImV4cCI6MjA5NDI5OTk2OH0.2Da6aCBpG325d9IKicBAGlIYP3eQC0ikFe1EU3ljVl0';
 const ADMIN_EMAIL   = 'asepmaulana89@gmail.com';
 const GEMINI_KEY    = 'AIzaSyCBv6au3PFiJN2PVffznttHNTgFa2ji7f8'; // API key milik kamu, dipakai semua user
-const GEMINI_MODEL  = 'gemini-2.0-flash';
+const GEMINI_MODEL  = 'gemini-2.5-flash';
 const WA_NUMBER     = '6282277577294';
 // Midtrans: isi setelah daftar di midtrans.com
 // Untuk production ganti ke: https://app.midtrans.com/snap/snap.js
@@ -893,7 +893,7 @@ function setFmt(t,f){
 }
 
 // ════════════════════════════════════════════
-// GENERATE — pakai Gemini 2.0, API key server
+// GENERATE — pakai Gemini 2, API key server
 // ════════════════════════════════════════════
 async function generate(t) {
   if (!files[t]){ toast('⚠️ Upload file terlebih dahulu!','error'); return; }
