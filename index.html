@@ -680,8 +680,8 @@ footer{border-top:1px solid var(--border);padding:48px 32px 32px;margin-top:80px
 const SUPABASE_URL  = 'https://qlgyjjqlzfdpuliojkdz.supabase.co';
 const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFsZ3lqanFsemZkcHVsaW9qa2R6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MjM5NjgsImV4cCI6MjA5NDI5OTk2OH0.2Da6aCBpG325d9IKicBAGlIYP3eQC0ikFe1EU3ljVl0';
 const ADMIN_EMAIL   = 'asepmaulana89@gmail.com';
-const GEMINI_KEY    = 'AIzaSyCv5iUsxGwIxhNEWs_cJQeOeimNdSGX3-8'; // API key milik kamu, dipakai semua user
-const GEMINI_MODEL  = 'gemini-2.5-flash';
+workerUrl: 'https://promptkita-api.NAMAKAMU.workers.dev',
+geminiModel: 'gemini-2.5-flash',
 const WA_NUMBER     = '6282277577294';
 // Midtrans: isi setelah daftar di midtrans.com
 // Untuk production ganti ke: https://app.midtrans.com/snap/snap.js
@@ -926,7 +926,7 @@ async function generate(t) {
       :`Berikan prompt dalam format teks dengan bagian berlabel: Subjek, Gaya/Style, Pencahayaan, Komposisi, Suasana/Mood, Palet Warna, Detail Teknis, dan Prompt Lengkap Siap Pakai.`;
 
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_KEY}`,
+    const res = await fetch(CFG.workerUrl,
       { method:'POST', headers:{'Content-Type':'application/json'},
         body:JSON.stringify({contents:[{parts:[{text:`Analisis ${cfg.type} ini dan hasilkan prompt AI yang detail. ${langStr} ${fmtStr}`},{inline_data:{mime_type:mime,data:b64}}]}],generationConfig:{temperature:.7,maxOutputTokens:2048}})
       }
